@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using WinStarter;
 using static System.Windows.Forms.LinkLabel;
@@ -25,13 +27,15 @@ namespace MicroStarter
                 mainPage.Controls.Add(tabListView);
 
                 ImageList imageList = new ImageList();
-                imageList.ImageSize = new Size(48,48);
+                imageList.ImageSize = new Size(48, 48);
                 imageList.ColorDepth = ColorDepth.Depth32Bit;
-            
+
                 tabListView.View = View.LargeIcon;
                 tabListView.LargeImageList = imageList;
 
-                if(!(tabData.TabItemDatas is null))
+                tabListView.Click += onItemClick;
+
+                if (!(tabData.TabItemDatas is null))
                 {
                     tabListView.BeginUpdate();
                     foreach (TabItemData tabItemData in tabData.TabItemDatas)
@@ -40,6 +44,7 @@ namespace MicroStarter
                         imageList.Images.Add(icon);
                         ListViewItem item = new ListViewItem(tabItemData.ItemName);
                         item.ImageIndex = tabListView.Items.Count;
+                        item.Tag = tabItemData;
                         tabListView.Items.Add(item);
                     }
                     tabListView.EndUpdate();
@@ -49,7 +54,26 @@ namespace MicroStarter
             }
         }
 
-        
+        private void onItemClick(object? sender, EventArgs e)
+        {
+            ListView tabListView = sender as ListView;
+
+            ListViewItem viewItem = tabListView.FocusedItem as ListViewItem;
+            TabItemData tabItemData = viewItem.Tag as TabItemData;
+   
+            if (File.Exists(tabItemData.ItemPath))
+            {
+                Process process = new Process();
+                ProcessStartInfo startInfo = new ProcessStartInfo(tabItemData.ItemPath, "");
+                startInfo.UseShellExecute = true;
+                startInfo.CreateNoWindow = true;
+                startInfo.WorkingDirectory = Path.GetDirectoryName(tabItemData.ItemPath);
+
+                process.StartInfo = startInfo;
+                process.Start();
+            }
+        }
+
         private void addTabListItem(TabItemData tabItemData)
         {
             TabPage tabMainPage = mainTabControl.TabPages[mainTabControl.SelectedIndex];
