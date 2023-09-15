@@ -18,7 +18,7 @@ namespace WinStarter
 
         public String? TabName { get; set; }
 
-        public List<TabItemData> TabItemDatas { get; set; }
+        public List<TabItemData>? TabItemDatas { get; set; }
 
     }
 

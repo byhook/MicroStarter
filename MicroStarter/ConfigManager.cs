@@ -32,7 +32,7 @@ namespace WinStarter
 
         }
 
-        public void AddTabItemData(int tabIndex, TabItemData tabItemData)
+        public bool AddTabItemData(int tabIndex, TabItemData tabItemData)
         {
             TabData? tabData = null;
             if (mainConfigData?.TabRootData == null)
@@ -46,7 +46,15 @@ namespace WinStarter
             {
                 tabData.TabItemDatas = new List<TabItemData>();
             }
+            foreach (var item in tabData.TabItemDatas)
+            {
+                if (item.ItemPath == tabItemData.ItemPath)
+                {
+                    return false;
+                }
+            }
             tabData.TabItemDatas?.Add(tabItemData);
+            return true;
         }
 
         public ConfigData LoadConfig()

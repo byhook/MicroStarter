@@ -49,30 +49,54 @@ namespace MicroStarter
             }
         }
 
+        
+        private void addTabListItem(TabItemData tabItemData)
+        {
+            TabPage tabMainPage = mainTabControl.TabPages[mainTabControl.SelectedIndex];
+            ListView tabListView = (ListView)tabMainPage.Controls[0];
+
+            tabListView.BeginUpdate();
+
+            Icon icon = IconManager.GetInstance().getTargetIcon(tabItemData.ItemPath);
+            tabListView.LargeImageList.Images.Add(icon);
+            ListViewItem item = new ListViewItem(tabItemData.ItemName);
+            item.ImageIndex = tabListView.Items.Count;
+            tabListView.Items.Add(item);
+            tabListView.EndUpdate();
+        }
+
         public static readonly Guid CLSID_WSH_SHELL = new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8");
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             string[] dropFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
-            // 对拖放的文件进行处理
-            foreach (string filePath in dropFiles)
+            if (dropFiles != null && dropFiles.Length > 0)
             {
-                var tabItemData = new TabItemData();
-                if (Path.GetExtension(filePath) == ".lnk")
+                // 对拖放的文件进行处理
+                foreach (string filePath in dropFiles)
                 {
-                    dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_WSH_SHELL));
-                    var objShortcut = objWshShell.CreateShortcut(filePath);
-                    tabItemData.ItemPath = objShortcut.TargetPath;
-                    string fileName = Path.GetFileName(objShortcut.TargetPath);
-                    tabItemData.ItemName = fileName;
-                } else
-                {
-                    string fileName = Path.GetFileName(filePath);
-                    tabItemData.ItemName = fileName;
-                    tabItemData.ItemPath = filePath;
+                    var tabItemData = new TabItemData();
+                    if (Path.GetExtension(filePath) == ".lnk")
+                    {
+                        dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_WSH_SHELL));
+                        var objShortcut = objWshShell.CreateShortcut(filePath);
+                        tabItemData.ItemPath = objShortcut.TargetPath;
+                        string fileName = Path.GetFileName(objShortcut.TargetPath);
+                        tabItemData.ItemName = fileName;
+                    }
+                    else
+                    {
+                        string fileName = Path.GetFileName(filePath);
+                        tabItemData.ItemName = fileName;
+                        tabItemData.ItemPath = filePath;
+                    }
+                    if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
+                    {
+                        //添加到列表里
+                        addTabListItem(tabItemData);
+                    }
                 }
-                ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData);
+                ConfigManager.GetInstance().SaveConfig();
             }
-            ConfigManager.GetInstance().SaveConfig();
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
