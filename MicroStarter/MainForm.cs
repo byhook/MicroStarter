@@ -33,7 +33,7 @@ namespace MicroStarter
                 tabListView.View = View.LargeIcon;
                 tabListView.LargeImageList = imageList;
 
-                tabListView.Click += onItemClick;
+                tabListView.MouseClick += onItemClick;
 
                 if (!(tabData.TabItemDatas is null))
                 {
@@ -55,6 +55,15 @@ namespace MicroStarter
         }
 
         private void onItemClick(object? sender, EventArgs e)
+        {
+            var targetEventArgs = e as MouseEventArgs;
+            if(targetEventArgs.Button == MouseButtons.Left)
+            {
+                onItemLeftMouseClick(sender);
+            }
+        }
+
+        private void onItemLeftMouseClick(object? sender)
         {
             ListView tabListView = sender as ListView;
 
