@@ -42,6 +42,7 @@
             // 
             // MainForm
             // 
+            AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 17F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(384, 681);
@@ -50,6 +51,8 @@
             StartPosition = FormStartPosition.CenterScreen;
             Text = "启动器";
             Load += MainForm_Load;
+            DragDrop += MainForm_DragDrop;
+            DragEnter += MainForm_DragEnter;
             ResumeLayout(false);
         }
 

@@ -1,3 +1,5 @@
+using WinStarter;
+
 namespace MicroStarter
 {
     public partial class MainForm : Form
@@ -9,15 +11,28 @@ namespace MicroStarter
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            TabPage mainPage = new TabPage();
-            mainPage.Text = "常用工具";
+            var mainConfigData = ConfigManager.GetInstance().LoadConfig();
+            foreach (TabData tabData in mainConfigData.TabRootData)
+            {
+                TabPage mainPage = new TabPage();
+                mainPage.Text = tabData.TabName;
 
-            ListView tabListView = new ListView();
-            tabListView.Dock = DockStyle.Fill;
-            mainPage.Controls.Add(tabListView);
+                ListView tabListView = new ListView();
+                tabListView.Dock = DockStyle.Fill;
+                mainPage.Controls.Add(tabListView);
 
-            mainTabControl.TabPages.Add(mainPage);
+                mainTabControl.TabPages.Add(mainPage);
+            }
+        }
 
+        private void MainForm_DragDrop(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void MainForm_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Move;
         }
     }
 }
