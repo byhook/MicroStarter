@@ -10,7 +10,7 @@ namespace WinStarter
 {
     public sealed class ConfigManager
     {
-        private const String CONFIG_DATA_NAME = "configData.json";
+        private const String CONFIG_DATA_NAME = "MicroConfig.json";
 
         private static readonly Lazy<ConfigManager> _lazy =
             new Lazy<ConfigManager>(() => new ConfigManager());

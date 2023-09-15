@@ -47,6 +47,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(384, 681);
             Controls.Add(mainTabControl);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximumSize = new Size(600, 800);
+            MinimumSize = new Size(400, 400);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "启动器";

@@ -32,9 +32,12 @@ namespace WinStarter
             return _lazy.Value;
         }
 
+        [System.Runtime.InteropServices.DllImport("user32.dll", CharSet = CharSet.Auto)]
+        extern static bool DestroyIcon(IntPtr handle);
 
-        public Icon getTargetIcon(String execPath)
+        public Icon? getTargetIcon(String execPath)
         {
+            /*
             const uint SHGFI_ICON = 0x000000100;     // Get icon
             const uint SHGFI_LARGEICON = 0x000000000;  // Get large icon
             const uint SHGFI_SMALLICON = 0x000000001;  // Get small icon   
@@ -48,11 +51,10 @@ namespace WinStarter
             {
                 ic = Icon.FromHandle(fi.hIcon);
             }
-
-            /*
-            string filePath = @"I:\\MapleStory\\冒险岛客户端\\冒险岛079\\MapleStarter.exe";
-            Icon ic = Icon.ExtractAssociatedIcon(filePath);
             */
+;
+            Icon ic = Icon.ExtractAssociatedIcon(execPath);
+            
             return ic;
         }
 

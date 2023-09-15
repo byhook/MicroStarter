@@ -60,7 +60,7 @@ namespace MicroStarter
 
             ListViewItem viewItem = tabListView.FocusedItem as ListViewItem;
             TabItemData tabItemData = viewItem.Tag as TabItemData;
-   
+
             if (File.Exists(tabItemData.ItemPath))
             {
                 Process process = new Process();
@@ -82,16 +82,21 @@ namespace MicroStarter
             tabListView.BeginUpdate();
 
             Icon icon = IconManager.GetInstance().getTargetIcon(tabItemData.ItemPath);
-            tabListView.LargeImageList.Images.Add(icon);
+
             ListViewItem item = new ListViewItem(tabItemData.ItemName);
+            item.Tag = tabItemData;
             item.ImageIndex = tabListView.Items.Count;
             tabListView.Items.Add(item);
+
+            tabListView.LargeImageList.Images.Add(icon);
+
             tabListView.EndUpdate();
         }
 
         public static readonly Guid CLSID_WSH_SHELL = new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8");
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
+
             string[] dropFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
             if (dropFiles != null && dropFiles.Length > 0)
             {
@@ -113,14 +118,18 @@ namespace MicroStarter
                         tabItemData.ItemName = fileName;
                         tabItemData.ItemPath = filePath;
                     }
+
                     if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
                     {
                         //添加到列表里
                         addTabListItem(tabItemData);
                     }
+
                 }
                 ConfigManager.GetInstance().SaveConfig();
+
             }
+
         }
 
         private void MainForm_DragEnter(object sender, DragEventArgs e)
