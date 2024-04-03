@@ -20,4 +20,19 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
     }
+
+    private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
+    {
+        var newTabItem = new TabItem
+        {
+            Header = "常用工具"
+        };
+        var textBlock = new TextBlock
+        {
+            Text = "动态内容"
+        };
+        newTabItem.Content = textBlock;
+        MainTabControl.Items.Add(newTabItem);
+        MainTabControl.SelectedIndex = 0;
+    }
 }
