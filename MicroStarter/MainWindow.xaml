@@ -5,9 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MicroStarter"
         mc:Ignorable="d"
-        Title="启动器 1.0" Height="600" Width="360" Loaded="MainWindow_OnLoaded">
-    <TabControl Name="MainTabControl">
+        Title="启动器 1.0" Height="640" Width="360" Loaded="MainWindow_OnLoaded" ResizeMode="NoResize">
+    <Grid>
+        <TabControl Name="MainTabControl" Margin="0,0,0,36">
 
-    </TabControl>
+        </TabControl>
+        
+        <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+            <Image Height="30" Source="MicroStarter.ico" />
+        </StatusBar>
+    </Grid>
 
 </Window>

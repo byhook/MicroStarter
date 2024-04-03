@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,16 +24,65 @@ public partial class MainWindow : Window
 
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        var newTabItem = new TabItem
-        {
-            Header = "常用工具"
-        };
-        var textBlock = new TextBlock
-        {
-            Text = "动态内容"
-        };
-        newTabItem.Content = textBlock;
-        MainTabControl.Items.Add(newTabItem);
-        MainTabControl.SelectedIndex = 0;
+        SetupTabPages();
     }
+    
+    public class DataItem
+    {
+        public string Icon { get; set; }
+        public string Name { get; set; }
+    }
+
+    private void SetupTabPages()
+    {
+        var mainConfigData = ConfigManager.GetInstance().LoadConfig();
+        Console.WriteLine(mainConfigData);
+        
+        foreach (var tabPageData in mainConfigData.TabRootData)
+        {
+            var newTabItem = new TabItem
+            {
+                Header = tabPageData.TabName
+            };
+            var tabItemView = new TabPageListBox();
+            var tabListView = tabItemView.TabListBox;
+            newTabItem.Content = tabListView;
+            tabListView.AllowDrop = true;
+            
+            /*
+            tabListView.DragEnter += new DragEventHandler(listView1_DragEnter);
+            tabListView.DragOver += new DragEventHandler(listView1_DragOver);
+            tabListView.DragDrop += new DragEventHandler(listView1_DragDrop);
+
+            tabListView.ItemDrag += ListView1_ItemDrag;
+            */
+
+            if (!(tabPageData.TabItemDataList is null))
+            {
+                // 创建数据集合
+                ObservableCollection<DataItem> items = new ObservableCollection<DataItem>
+                {
+                    new DataItem { Name = "John Doe", Icon = "WinLogo.png" },
+                    new DataItem { Name = "哈哈哈哈", Icon = "WinLogo.png" },
+                };
+                
+                /*
+                foreach (var tabItemData in tabPageData.TabItemDatas)
+                {
+                    var item = new ListViewItem();
+                    item.Name = tabItemData.ItemName;
+                    item.Tag = tabItemData;
+                    tabListView.Items.Add(item);
+                }*/
+                
+                tabListView.ItemsSource = tabPageData.TabItemDataList;
+            }
+            
+            MainTabControl.Items.Add(newTabItem);
+        }
+        
+        MainTabControl.SelectedIndex = 0;
+        
+    }
+    
 }
