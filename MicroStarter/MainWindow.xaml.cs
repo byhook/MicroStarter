@@ -36,13 +36,15 @@ public partial class MainWindow : Window
             newTabItem.Content = tabListView;
             tabListView.AllowDrop = true;
 
+     
             /*
             tabListView.DragEnter += new DragEventHandler(listView1_DragEnter);
             tabListView.DragOver += new DragEventHandler(listView1_DragOver);
-            tabListView.DragDrop += new DragEventHandler(listView1_DragDrop);
-
-            tabListView.ItemDrag += ListView1_ItemDrag;
+            tabListView.DragLeave += new DragEventHandler(listView1_DragDrop);
             */
+
+            //tabListView.ItemDrag += ListView1_ItemDrag;
+            
             if (!(tabPageData.TabItemDataList is null))
             {
                 /*

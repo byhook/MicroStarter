@@ -7,14 +7,16 @@
              mc:Ignorable="d">
     <ListView Name="TabListView"
               Background="Transparent"
+              MouseDoubleClick="TabListView_OnMouseDoubleClick"
               ScrollViewer.VerticalScrollBarVisibility="Hidden">
         <!-- 定义上下文菜单 -->
         <ListView.ContextMenu>
-            <ContextMenu Name="MyContextMenu">
-                <MenuItem Header="编辑" />
-                <MenuItem Header="删除" />
+            <ContextMenu Name="ListItemContextMenu">
+                <MenuItem Header="打开文件位置" Click="MenuItem_OnClickOpenPath"/>
+                <MenuItem Header="复制文件路径" Click="MenuItem_OnClickCopyPath"/>
                 <Separator />
-                <MenuItem Header="退出" />
+                <MenuItem Header="编辑" Click="MenuItem_OnClickEdit"/>
+                <MenuItem Header="删除" />
             </ContextMenu>
         </ListView.ContextMenu>
         <ListView.ItemsPanel>

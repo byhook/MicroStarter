@@ -46,7 +46,7 @@ public class TabItemData
 
     public string? ItemIconPath { get; set; }
 
-    public string? ItemRunCommand { get; set; }
+    public string ItemRunCommand = "";
 
     public bool RunWithAdmin { get; set; }
     
