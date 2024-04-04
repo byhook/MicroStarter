@@ -22,18 +22,17 @@ public class TabListData
     public List<TabListItemData>? TabItemDataList { get; set; }
 }
 
-public class TabListItemData: INotifyPropertyChanged
+public class TabListItemData : INotifyPropertyChanged
 {
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
-    
+
     private string? _itemName = null;
-    
+
     public string? ItemName
     {
         get { return _itemName; }
@@ -44,23 +43,10 @@ public class TabListItemData: INotifyPropertyChanged
             OnPropertyChanged(nameof(ItemName));
         }
     }
-    
-    [JsonIgnore]
-    public ImageSource? ItemIconSource
-    {
-        get
-        {
-            if (!File.Exists(ItemPath)) return null;
-            var bitmap = IconManager.GetLargeIcon(ItemPath);
-            if (bitmap != null)
-            {
-                return Imaging.CreateBitmapSourceFromHBitmap(
-                    bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            }
 
-            return null;
-        }
-    }
+    [JsonIgnore] public Bitmap? ItemBitmap { get; set; }
+    
+    [JsonIgnore] public ImageSource? ItemIconSource { get; set; }
 
     public string? ItemPath { get; set; }
 

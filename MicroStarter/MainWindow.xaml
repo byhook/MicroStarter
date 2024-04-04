@@ -9,11 +9,14 @@
         Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize">
     <Grid>
         <TabControl Name="MainTabControl"
+                    SelectedIndex="0"
                     Margin="0,0,0,36"
                     BorderBrush="Transparent"
                     BorderThickness="0">
 
         </TabControl>
+        
+        <ProgressBar Visibility="Hidden"></ProgressBar>
 
         <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
             <Image Height="30" Source="MicroStarter.ico" />
