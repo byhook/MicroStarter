@@ -1,4 +1,7 @@
-﻿namespace MicroStarter;
+﻿using System.Text.Json.Serialization;
+using System.Windows.Media;
+
+namespace MicroStarter;
 
 public class ConfigData
 {
@@ -16,11 +19,14 @@ public class TabItemData
 {
     public string? ItemName { get; set; }
 
+    
     public string? ItemPath { get; set; }
+    
 
     public string? ItemIconPath { get; set; }
 
     public string? ItemRunCommand { get; set; }
 
     public bool RunWithAdmin { get; set; }
+    
 }

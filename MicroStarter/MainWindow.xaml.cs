@@ -44,8 +44,8 @@ public partial class MainWindow : Window
             {
                 Header = tabPageData.TabName
             };
-            var tabItemView = new TabPageListBox();
-            var tabListView = tabItemView.TabListBox;
+            var tabItemView = new TabPageListView();
+            var tabListView = tabItemView.TabListView;
             newTabItem.Content = tabListView;
             tabListView.AllowDrop = true;
             
@@ -57,6 +57,8 @@ public partial class MainWindow : Window
             tabListView.ItemDrag += ListView1_ItemDrag;
             */
 
+            var image = new Image();
+            
             if (!(tabPageData.TabItemDataList is null))
             {
                 // 创建数据集合
@@ -74,7 +76,6 @@ public partial class MainWindow : Window
                     item.Tag = tabItemData;
                     tabListView.Items.Add(item);
                 }*/
-                
                 tabListView.ItemsSource = tabPageData.TabItemDataList;
             }
             

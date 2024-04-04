@@ -2,9 +2,9 @@
 
 namespace MicroStarter;
 
-public partial class TabPageListBox : UserControl
+public partial class TabPageListView : UserControl
 {
-    public TabPageListBox()
+    public TabPageListView()
     {
         InitializeComponent();
     }
