@@ -6,17 +6,67 @@
              xmlns:local="clr-namespace:MicroStarter"
              mc:Ignorable="d">
     <ListView Name="TabListView"
-              BorderBrush="Transparent"
-              BorderThickness="0"
               ScrollViewer.VerticalScrollBarVisibility="Hidden">
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
                 <UniformGrid Columns="4" Width="336" />
             </ItemsPanelTemplate>
         </ListView.ItemsPanel>
+        <ListView.Resources>
+            <!--非高亮文本色-->
+            <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Green" />
+            <Style TargetType="ListView">
+                <!--重定义ListView中项的样式-->
+                <Setter Property="ItemTemplate">
+                    <Setter.Value>
+                        <DataTemplate>
+                            <Grid Margin="0" HorizontalAlignment="Stretch" Width="200">
+                                <Border Margin="5" BorderBrush="Transparent" 
+                                        BorderThickness="1" 
+                                        CornerRadius="5"
+                                        Background="{Binding Path=Background, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListViewItem}}}">
+                                    <Grid Margin="5">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="{Binding StudentID}" />
+                                        <TextBlock Grid.Row="1" Text="{Binding StudentName}" />
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+                <!--自定义选中项的颜色-->
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style TargetType="ListViewItem">
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="true">
+                                    <Setter Property="Background" Value="Yellow" />
+                                    <Setter Property="Foreground" Value="Red" />
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="true">
+                                    <Setter Property="Background" Value="LightGreen" />
+                                    <Setter Property="Foreground" Value="OrangeRed" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ListView.Resources>
+        <!-- <ListView.ItemContainerStyle> -->
+        <!--     <Style TargetType="{x:Type ListViewItem}"> -->
+        <!--         <Setter Property="Background" Value="Transparent"/> -->
+        <!--         <Setter Property="BorderBrush" Value="Transparent"/> -->
+        <!--         <Setter Property="BorderThickness" Value="0"/> -->
+        <!--     </Style> -->
+        <!-- </ListView.ItemContainerStyle> -->
         <ListView.ItemTemplate>
             <DataTemplate>
-                <Grid>
+                <Grid Background="Transparent">
                     <Image Source="{Binding ItemIconPath}" Height="120" VerticalAlignment="Top" />
                     <TextBlock Text="{Binding ItemName}" TextWrapping="Wrap" TextAlignment="Center"
                                VerticalAlignment="Bottom" />
