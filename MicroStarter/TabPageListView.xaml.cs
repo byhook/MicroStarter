@@ -34,10 +34,34 @@ public partial class TabPageListView : UserControl
 
     private void MenuItem_OnClickOpenPath(object sender, RoutedEventArgs e)
     {
+        var contextMenuItem = sender as MenuItem;
+        var tabPageListView = contextMenuItem?.DataContext as ListView;
+        var tabListItemData = tabPageListView?.SelectedValue as TabItemData;
+
+        if (File.Exists(tabListItemData?.ItemPath))
+        {
+            // 使用DirectoryInfo获取文件的父目录
+            var directoryInfo = Directory.GetParent(tabListItemData.ItemPath);
+            var startInfo = new ProcessStartInfo
+            {
+                Arguments = directoryInfo?.FullName,
+                FileName = "explorer.exe"
+            };
+            Process.Start(startInfo);
+        }
     }
 
     private void MenuItem_OnClickCopyPath(object sender, RoutedEventArgs e)
     {
+        var contextMenuItem = sender as MenuItem;
+        var tabPageListView = contextMenuItem?.DataContext as ListView;
+        var tabListItemData = tabPageListView?.SelectedValue as TabItemData;
+
+        if (File.Exists(tabListItemData?.ItemPath))
+        {
+            // 将文件路径复制到剪贴板
+            Clipboard.SetText(tabListItemData.ItemPath);
+        }
     }
 
     private void MenuItem_OnClickEdit(object sender, RoutedEventArgs e)
