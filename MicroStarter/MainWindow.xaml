@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MicroStarter"
         mc:Ignorable="d"
-        Title="启动器 1.0" Height="720" Width="360" Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize">
+        Title="微启动器 1.0" Height="720" Width="360" 
+        Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize">
     <Grid>
         <TabControl Name="MainTabControl"
                     Margin="0,0,0,36"

@@ -8,6 +8,15 @@
     <ListView Name="TabListView"
               Background="Transparent"
               ScrollViewer.VerticalScrollBarVisibility="Hidden">
+        <!-- 定义上下文菜单 -->
+        <ListView.ContextMenu>
+            <ContextMenu Name="MyContextMenu">
+                <MenuItem Header="编辑" />
+                <MenuItem Header="删除" />
+                <Separator />
+                <MenuItem Header="退出" />
+            </ContextMenu>
+        </ListView.ContextMenu>
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
                 <UniformGrid Columns="4" Width="336" VerticalAlignment="Top" HorizontalAlignment="Center" />
