@@ -8,7 +8,7 @@ namespace MicroStarter;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private ListViewModel _listViewModel;
+    private ListViewConfigItemModel _listViewConfigItemModel;
 
     public MainWindow()
     {
@@ -26,7 +26,6 @@ public partial class MainWindow : Window
 
         foreach (var tabPageData in mainConfigData.TabRootData)
         {
-            
             var newTabItem = new TabItem
             {
                 Header = tabPageData.TabName
@@ -35,7 +34,10 @@ public partial class MainWindow : Window
             var tabListView = tabItemView.TabListView;
             newTabItem.Content = tabListView;
             tabListView.AllowDrop = true;
-            
+
+            _listViewConfigItemModel = new ListViewConfigItemModel();
+            tabListView.DataContext = _listViewConfigItemModel;
+
             /*
             tabListView.DragEnter += new DragEventHandler(listView1_DragEnter);
             tabListView.DragOver += new DragEventHandler(listView1_DragOver);
@@ -44,26 +46,20 @@ public partial class MainWindow : Window
 
             //tabListView.ItemDrag += ListView1_ItemDrag;
 
-            if (!(tabPageData.TabItemDataList is null))
+            if (tabPageData.TabItemDataList != null)
             {
-                /*
-                foreach (var tabItemData in tabPageData.TabItemDatas)
+                foreach (var tabItemData in tabPageData.TabItemDataList)
                 {
-                    var item = new ListViewItem();
-                    item.Name = tabItemData.ItemName;
-                    item.Tag = tabItemData;
-                    tabListView.Items.Add(item);
-                }*/
+                    _listViewConfigItemModel.ListViewItems.Add(tabItemData);
+                }
 
-                tabListView.ItemsSource = tabPageData.TabItemDataList;
+                tabListView.ItemsSource = _listViewConfigItemModel.ListViewItems;
             }
-
+            
+            //添加到TabControl里去
             MainTabControl.Items.Add(newTabItem);
         }
-        
+
         MainTabControl.SelectedIndex = 0;
-        
-        
-        
     }
 }

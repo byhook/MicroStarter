@@ -1,34 +1,34 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 
 namespace MicroStarter;
 
 public partial class EditWindow : Window
 {
-    private TabItemData _tabItemData;
+    private TabListItemData _tabListItemData;
 
-    public EditWindow(TabItemData tabItemData)
+    public EditWindow(TabListItemData tabListItemData)
     {
-        this._tabItemData = tabItemData;
+        _tabListItemData = tabListItemData;
         InitializeComponent();
     }
 
-
     private void EditWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        TextBoxItemName.Text = _tabItemData.ItemName ?? string.Empty;
-        TextBoxItemPath.Text = _tabItemData.ItemPath ?? string.Empty;
-        TextBoxIconPath.Text = _tabItemData.ItemIconPath ?? string.Empty;
-        TextBoxRunCommand.Text = _tabItemData.ItemRunCommand ?? string.Empty;
-        CheckBoxRunWithAdmin.IsChecked = _tabItemData.RunWithAdmin;
+        TextBoxItemName.Text = _tabListItemData.ItemName ?? string.Empty;
+        TextBoxItemPath.Text = _tabListItemData.ItemPath ?? string.Empty;
+        TextBoxIconPath.Text = _tabListItemData.ItemIconPath ?? string.Empty;
+        TextBoxRunCommand.Text = _tabListItemData.ItemRunCommand ?? string.Empty;
+        CheckBoxRunWithAdmin.IsChecked = _tabListItemData.RunWithAdmin;
     }
 
     private void EditWindow_OnSaveClick(object sender, RoutedEventArgs e)
     {
-        _tabItemData.ItemName = TextBoxItemName.Text;
-        _tabItemData.ItemPath = TextBoxItemPath.Text;
-        _tabItemData.ItemIconPath = TextBoxIconPath.Text;
-        _tabItemData.ItemRunCommand = TextBoxRunCommand.Text;
-        _tabItemData.RunWithAdmin = CheckBoxRunWithAdmin.IsChecked.GetValueOrDefault(false);
+        _tabListItemData.ItemName = TextBoxItemName.Text;
+        _tabListItemData.ItemPath = TextBoxItemPath.Text;
+        _tabListItemData.ItemIconPath = TextBoxIconPath.Text;
+        _tabListItemData.ItemRunCommand = TextBoxRunCommand.Text;
+        _tabListItemData.RunWithAdmin = CheckBoxRunWithAdmin.IsChecked.GetValueOrDefault(false);
         
         ConfigManager.GetInstance().SaveConfig();
         //关闭当前对话框

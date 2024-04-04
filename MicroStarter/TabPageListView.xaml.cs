@@ -17,7 +17,7 @@ public partial class TabPageListView : UserControl
     private void TabListView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         var tabPageListView = sender as ListView;
-        var tabListItemData = tabPageListView?.SelectedValue as TabItemData;
+        var tabListItemData = tabPageListView?.SelectedValue as TabListItemData;
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
@@ -36,7 +36,7 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabListItemData = tabPageListView?.SelectedValue as TabItemData;
+        var tabListItemData = tabPageListView?.SelectedValue as TabListItemData;
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
@@ -55,7 +55,7 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabListItemData = tabPageListView?.SelectedValue as TabItemData;
+        var tabListItemData = tabPageListView?.SelectedValue as TabListItemData;
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
@@ -68,19 +68,18 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabItemData = tabPageListView?.SelectedValue as TabItemData;
-        if (tabItemData != null)
-        {
-            var editWindow = new EditWindow(tabItemData);
-            editWindow.ShowDialog();
-        }
+        var tabItemData = tabPageListView?.SelectedValue as TabListItemData;
+        if (tabItemData == null) return;
+
+        var editWindow = new EditWindow(tabItemData);
+        editWindow.ShowDialog();
     }
 
     private void MenuItem_OnClickDelete(object sender, RoutedEventArgs e)
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabItemData = tabPageListView?.SelectedValue as TabItemData;
+        var tabItemData = tabPageListView?.SelectedValue as TabListItemData;
 
         var tabIndex = GetTabControlIndex(tabPageListView);
         //if (ConfigManager.GetInstance().RemoveTabItemData(tabPageListView.TabIndex, tabItemData))

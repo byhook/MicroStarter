@@ -4,23 +4,23 @@ using System.Runtime.CompilerServices;
 
 namespace MicroStarter;
 
-public class ListViewModel : INotifyPropertyChanged
+public class ListViewConfigItemModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public ObservableCollection<TabItemData> ListViewItems { get; set; }
+    public ObservableCollection<TabListItemData> ListViewItems { get; set; }
 
-    public ListViewModel()
+    public ListViewConfigItemModel()
     {
-        ListViewItems = new ObservableCollection<TabItemData>();
+        ListViewItems = new ObservableCollection<TabListItemData>();
         ListViewItems.CollectionChanged += (s, e) => OnPropertyChanged(nameof(ListViewItems));
     }
 
-    public void RemoveItem(TabItemData item)
+    public void RemoveItem(TabListItemData listItem)
     {
-        if (ListViewItems.Contains(item))
+        if (ListViewItems.Contains(listItem))
         {
-            ListViewItems.Remove(item);
+            ListViewItems.Remove(listItem);
         }
     }
 

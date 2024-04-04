@@ -13,7 +13,7 @@ public sealed class ConfigManager
         new(() => new ConfigManager());
 
     //配置数据
-    private ConfigData MainConfigData { get; set; } = new();
+    private ConfigItem MainConfigItem { get; set; } = new();
 
     public static ConfigManager GetInstance()
     {
@@ -24,38 +24,38 @@ public sealed class ConfigManager
     {
     }
 
-    public bool RemoveTabItemData(int tabIndex, TabItemData tabItemData)
+    public bool RemoveTabItemData(int tabIndex, TabListItemData tabListItemData)
     {
-        var tabData = MainConfigData.TabRootData?[tabIndex];
+        var tabData = MainConfigItem.TabRootData?[tabIndex];
         if (tabData?.TabItemDataList == null) return false;
-        return tabData.TabItemDataList.Remove(tabItemData);
+        return tabData.TabItemDataList.Remove(tabListItemData);
     }
 
-    public bool AddTabItemData(int tabIndex, TabItemData tabItemData)
+    public bool AddTabItemData(int tabIndex, TabListItemData tabListItemData)
     {
-        TabData? tabData = null;
-        if (MainConfigData.TabRootData == null)
+        TabListData? tabData = null;
+        if (MainConfigItem.TabRootData == null)
         {
-            MainConfigData.TabRootData = new List<TabData>();
-            tabData = new TabData();
-            MainConfigData.TabRootData.Add(tabData);
+            MainConfigItem.TabRootData = new List<TabListData>();
+            tabData = new TabListData();
+            MainConfigItem.TabRootData.Add(tabData);
         }
 
-        tabData = MainConfigData.TabRootData[tabIndex];
-        tabData.TabItemDataList ??= new List<TabItemData>();
-        if (tabData.TabItemDataList.Any(item => item.ItemPath == tabItemData.ItemPath))
+        tabData = MainConfigItem.TabRootData[tabIndex];
+        tabData.TabItemDataList ??= new List<TabListItemData>();
+        if (tabData.TabItemDataList.Any(item => item.ItemPath == tabListItemData.ItemPath))
         {
             return false;
         }
 
-        tabData.TabItemDataList?.Add(tabItemData);
+        tabData.TabItemDataList?.Add(tabListItemData);
         return true;
     }
 
 
     public void SwapTabItemData(int tabIndex, int dragIndex, int dropIndex)
     {
-        var tabData = MainConfigData.TabRootData?[tabIndex];
+        var tabData = MainConfigItem.TabRootData?[tabIndex];
         if (tabData?.TabItemDataList == null) return;
         var dragItemData = tabData.TabItemDataList[dragIndex];
         tabData.TabItemDataList.Remove(dragItemData);
@@ -64,48 +64,48 @@ public sealed class ConfigManager
         SaveConfig();
     }
 
-    public ConfigData LoadConfig()
+    public ConfigItem LoadConfig()
     {
-        ConfigData? tempConfigData = null;
+        ConfigItem? tempConfigData = null;
         if (File.Exists(ConfigDataName))
         {
             var configContent = File.ReadAllText(ConfigDataName);
             if (!string.IsNullOrEmpty(configContent))
             {
-                tempConfigData = JsonSerializer.Deserialize<ConfigData>(configContent);
+                tempConfigData = JsonSerializer.Deserialize<ConfigItem>(configContent);
             }
         }
 
         if (tempConfigData != null)
         {
-            MainConfigData = tempConfigData;
+            MainConfigItem = tempConfigData;
         }
         else if (tempConfigData == null)
         {
-            MainConfigData = new ConfigData();
+            MainConfigItem = new ConfigItem();
         }
 
-        if (MainConfigData.TabRootData != null) return MainConfigData;
+        if (MainConfigItem.TabRootData != null) return MainConfigItem;
         //本地没有配置或者解析失败-默认给个常用工具配置
-        var tabDataList = new List<TabData>();
-        var tabData = new TabData();
+        var tabDataList = new List<TabListData>();
+        var tabData = new TabListData();
         tabData.TabName = "常用工具";
         tabDataList.Add(tabData);
-        MainConfigData.TabRootData = tabDataList;
+        MainConfigItem.TabRootData = tabDataList;
 
-        return MainConfigData;
+        return MainConfigItem;
     }
 
     public void SaveConfig()
     {
-        if (MainConfigData != null)
+        if (MainConfigItem != null)
         {
             var options = new JsonSerializerOptions
             {
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
                 WriteIndented = true,
             };
-            string content = JsonSerializer.Serialize(MainConfigData, options);
+            string content = JsonSerializer.Serialize(MainConfigItem, options);
             File.WriteAllText(ConfigDataName, content);
         }
     }

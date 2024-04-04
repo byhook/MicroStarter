@@ -1,5 +1,7 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel;
+using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Interop;
@@ -8,22 +10,41 @@ using System.Windows.Media.Imaging;
 
 namespace MicroStarter;
 
-public class ConfigData
+public class ConfigItem
 {
-    public List<TabData>? TabRootData { get; set; }
+    public List<TabListData>? TabRootData { get; set; }
 }
 
-public class TabData
+public class TabListData
 {
     public string? TabName { get; set; }
 
-    public List<TabItemData>? TabItemDataList { get; set; }
+    public List<TabListItemData>? TabItemDataList { get; set; }
 }
 
-public class TabItemData
+public class TabListItemData: INotifyPropertyChanged
 {
-    public string? ItemName { get; set; }
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    
+    private string? _itemName = null;
+    
+    public string? ItemName
+    {
+        get { return _itemName; }
+        set
+        {
+            if (_itemName == value) return;
+            _itemName = value;
+            OnPropertyChanged(nameof(ItemName));
+        }
+    }
+    
     [JsonIgnore]
     public ImageSource? ItemIconSource
     {
