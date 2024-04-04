@@ -10,6 +10,8 @@ namespace MicroStarter;
 /// </summary>
 public partial class MainWindow : Window
 {
+    private ListViewModel _listViewModel;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -23,10 +25,11 @@ public partial class MainWindow : Window
     private void SetupTabPages()
     {
         var mainConfigData = ConfigManager.GetInstance().LoadConfig();
-        Console.WriteLine(mainConfigData);
 
+        
         foreach (var tabPageData in mainConfigData.TabRootData)
         {
+            
             var newTabItem = new TabItem
             {
                 Header = tabPageData.TabName
@@ -35,8 +38,7 @@ public partial class MainWindow : Window
             var tabListView = tabItemView.TabListView;
             newTabItem.Content = tabListView;
             tabListView.AllowDrop = true;
-
-     
+            
             /*
             tabListView.DragEnter += new DragEventHandler(listView1_DragEnter);
             tabListView.DragOver += new DragEventHandler(listView1_DragOver);
@@ -44,7 +46,7 @@ public partial class MainWindow : Window
             */
 
             //tabListView.ItemDrag += ListView1_ItemDrag;
-            
+
             if (!(tabPageData.TabItemDataList is null))
             {
                 /*
@@ -55,6 +57,7 @@ public partial class MainWindow : Window
                     item.Tag = tabItemData;
                     tabListView.Items.Add(item);
                 }*/
+
                 tabListView.ItemsSource = tabPageData.TabItemDataList;
             }
 
@@ -63,5 +66,4 @@ public partial class MainWindow : Window
 
         MainTabControl.SelectedIndex = 0;
     }
-
 }

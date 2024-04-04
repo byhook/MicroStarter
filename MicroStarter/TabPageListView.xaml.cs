@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MicroStarter;
 
@@ -43,5 +44,47 @@ public partial class TabPageListView : UserControl
     {
         var editWindow = new EditWindow();
         editWindow.ShowDialog();
+    }
+
+    private void MenuItem_OnClickDelete(object sender, RoutedEventArgs e)
+    {
+        var contextMenuItem = sender as MenuItem;
+        var tabPageListView = contextMenuItem?.DataContext as ListView;
+        var tabItemData = tabPageListView?.SelectedValue as TabItemData;
+
+        var tabIndex = GetTabControlIndex(tabPageListView);
+        //if (ConfigManager.GetInstance().RemoveTabItemData(tabPageListView.TabIndex, tabItemData))
+        //{
+        tabPageListView?.Items.Remove(tabPageListView?.SelectedItem);
+        
+        tabPageListView.Items.Refresh();
+        
+        //保存配置到本地`
+        //ConfigManager.GetInstance().SaveConfig();
+        //}
+    }
+
+    public static int GetTabControlIndex(ListView listView)
+    {
+        DependencyObject? parent = listView;
+
+        while (parent != null && !(parent is TabControl))
+        {
+            parent = VisualTreeHelper.GetParent(parent);
+        }
+
+        if (parent != null)
+        {
+            TabControl tabControl = (TabControl)parent;
+            for (int i = 0; i < tabControl.Items.Count; i++)
+            {
+                if (tabControl.Items[i] is TabItem && ((TabItem)tabControl.Items[i]).Content == listView)
+                {
+                    return i;
+                }
+            }
+        }
+
+        return -1; // Not found
     }
 }
