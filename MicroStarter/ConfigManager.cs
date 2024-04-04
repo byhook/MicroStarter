@@ -9,7 +9,7 @@ public sealed class ConfigManager
 {
     private const string ConfigDataName = "MicroConfig.json";
 
-    private static readonly Lazy<ConfigManager> _lazy =
+    private static readonly Lazy<ConfigManager> Lazy =
         new Lazy<ConfigManager>(() => new ConfigManager());
 
     //配置数据
@@ -21,7 +21,7 @@ public sealed class ConfigManager
 
     public static ConfigManager GetInstance()
     {
-        return _lazy.Value;
+        return Lazy.Value;
     }
 
     public void AddTabPage(String tabName)

@@ -31,7 +31,7 @@ public class TabItemData
             if (ItemPath != null)
             {
                 var bitmap = IconManager.GetLargeIcon(ItemPath);
-                if (bitmap != null) 
+                if (bitmap != null)
                 {
                     return Imaging.CreateBitmapSourceFromHBitmap(
                         bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
@@ -40,14 +40,12 @@ public class TabItemData
             return null;
         }
     }
-    
+
     public string? ItemPath { get; set; }
-    
 
     public string? ItemIconPath { get; set; }
 
-    public string ItemRunCommand = "";
+    public string? ItemRunCommand { get; set; }
 
     public bool RunWithAdmin { get; set; }
-    
 }

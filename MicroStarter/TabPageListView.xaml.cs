@@ -66,8 +66,14 @@ public partial class TabPageListView : UserControl
 
     private void MenuItem_OnClickEdit(object sender, RoutedEventArgs e)
     {
-        var editWindow = new EditWindow();
-        editWindow.ShowDialog();
+        var contextMenuItem = sender as MenuItem;
+        var tabPageListView = contextMenuItem?.DataContext as ListView;
+        var tabItemData = tabPageListView?.SelectedValue as TabItemData;
+        if (tabItemData != null)
+        {
+            var editWindow = new EditWindow(tabItemData);
+            editWindow.ShowDialog();
+        }
     }
 
     private void MenuItem_OnClickDelete(object sender, RoutedEventArgs e)
@@ -80,9 +86,9 @@ public partial class TabPageListView : UserControl
         //if (ConfigManager.GetInstance().RemoveTabItemData(tabPageListView.TabIndex, tabItemData))
         //{
         tabPageListView?.Items.Remove(tabPageListView?.SelectedItem);
-        
+
         tabPageListView.Items.Refresh();
-        
+
         //保存配置到本地`
         //ConfigManager.GetInstance().SaveConfig();
         //}
