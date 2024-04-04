@@ -1,5 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Drawing;
+using System.Text.Json.Serialization;
+using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace MicroStarter;
 
@@ -19,6 +23,23 @@ public class TabItemData
 {
     public string? ItemName { get; set; }
 
+    [JsonIgnore]
+    public ImageSource? ItemIconSource
+    {
+        get
+        {
+            if (ItemPath != null)
+            {
+                var bitmap = IconManager.GetLargeIcon(ItemPath);
+                if (bitmap != null) 
+                {
+                    return Imaging.CreateBitmapSourceFromHBitmap(
+                        bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                }
+            }
+            return null;
+        }
+    }
     
     public string? ItemPath { get; set; }
     
