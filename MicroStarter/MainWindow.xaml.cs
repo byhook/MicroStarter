@@ -1,7 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
 
 namespace MicroStarter;
 
@@ -26,7 +24,6 @@ public partial class MainWindow : Window
     {
         var mainConfigData = ConfigManager.GetInstance().LoadConfig();
 
-        
         foreach (var tabPageData in mainConfigData.TabRootData)
         {
             
@@ -63,7 +60,10 @@ public partial class MainWindow : Window
 
             MainTabControl.Items.Add(newTabItem);
         }
-
+        
         MainTabControl.SelectedIndex = 0;
+        
+        
+        
     }
 }
