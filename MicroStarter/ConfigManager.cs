@@ -10,14 +10,10 @@ public sealed class ConfigManager
     private const string ConfigDataName = "MicroConfig.json";
 
     private static readonly Lazy<ConfigManager> Lazy =
-        new Lazy<ConfigManager>(() => new ConfigManager());
+        new(() => new ConfigManager());
 
     //配置数据
-    private ConfigData MainConfigData { get; set; }
-
-    private ConfigManager()
-    {
-    }
+    private ConfigData MainConfigData { get; set; } = new();
 
     public static ConfigManager GetInstance()
     {
@@ -30,19 +26,15 @@ public sealed class ConfigManager
 
     public bool RemoveTabItemData(int tabIndex, TabItemData tabItemData)
     {
-        var tabData = MainConfigData.TabRootData[tabIndex];
-        if (tabData.TabItemDataList != null)
-        {
-            return tabData.TabItemDataList.Remove(tabItemData);
-        }
-
-        return false;
+        var tabData = MainConfigData.TabRootData?[tabIndex];
+        if (tabData?.TabItemDataList == null) return false;
+        return tabData.TabItemDataList.Remove(tabItemData);
     }
 
     public bool AddTabItemData(int tabIndex, TabItemData tabItemData)
     {
         TabData? tabData = null;
-        if (MainConfigData?.TabRootData == null)
+        if (MainConfigData.TabRootData == null)
         {
             MainConfigData.TabRootData = new List<TabData>();
             tabData = new TabData();
@@ -50,17 +42,10 @@ public sealed class ConfigManager
         }
 
         tabData = MainConfigData.TabRootData[tabIndex];
-        if (tabData.TabItemDataList == null)
+        tabData.TabItemDataList ??= new List<TabItemData>();
+        if (tabData.TabItemDataList.Any(item => item.ItemPath == tabItemData.ItemPath))
         {
-            tabData.TabItemDataList = new List<TabItemData>();
-        }
-
-        foreach (var item in tabData.TabItemDataList)
-        {
-            if (item.ItemPath == tabItemData.ItemPath)
-            {
-                return false;
-            }
+            return false;
         }
 
         tabData.TabItemDataList?.Add(tabItemData);
@@ -71,14 +56,12 @@ public sealed class ConfigManager
     public void SwapTabItemData(int tabIndex, int dragIndex, int dropIndex)
     {
         var tabData = MainConfigData.TabRootData?[tabIndex];
-        if (tabData?.TabItemDataList != null)
-        {
-            var dragItemData = tabData.TabItemDataList[dragIndex];
-            tabData.TabItemDataList.Remove(dragItemData);
-            tabData.TabItemDataList.Insert(dropIndex, dragItemData);
-            //保存变更记录
-            SaveConfig();
-        }
+        if (tabData?.TabItemDataList == null) return;
+        var dragItemData = tabData.TabItemDataList[dragIndex];
+        tabData.TabItemDataList.Remove(dragItemData);
+        tabData.TabItemDataList.Insert(dropIndex, dragItemData);
+        //保存变更记录
+        SaveConfig();
     }
 
     public ConfigData LoadConfig()
@@ -86,7 +69,7 @@ public sealed class ConfigManager
         ConfigData? tempConfigData = null;
         if (File.Exists(ConfigDataName))
         {
-            String? configContent = File.ReadAllText(ConfigDataName);
+            var configContent = File.ReadAllText(ConfigDataName);
             if (!string.IsNullOrEmpty(configContent))
             {
                 tempConfigData = JsonSerializer.Deserialize<ConfigData>(configContent);
@@ -102,15 +85,13 @@ public sealed class ConfigManager
             MainConfigData = new ConfigData();
         }
 
-        if (MainConfigData.TabRootData == null)
-        {
-            //本地没有配置或者解析失败-默认给个常用工具配置
-            var tabDataList = new List<TabData>();
-            var tabData = new TabData();
-            tabData.TabName = "常用工具";
-            tabDataList.Add(tabData);
-            MainConfigData.TabRootData = tabDataList;
-        }
+        if (MainConfigData.TabRootData != null) return MainConfigData;
+        //本地没有配置或者解析失败-默认给个常用工具配置
+        var tabDataList = new List<TabData>();
+        var tabData = new TabData();
+        tabData.TabName = "常用工具";
+        tabDataList.Add(tabData);
+        MainConfigData.TabRootData = tabDataList;
 
         return MainConfigData;
     }

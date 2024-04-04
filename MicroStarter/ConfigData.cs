@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.IO;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Interop;
@@ -28,15 +29,14 @@ public class TabItemData
     {
         get
         {
-            if (ItemPath != null)
+            if (!File.Exists(ItemPath)) return null;
+            var bitmap = IconManager.GetLargeIcon(ItemPath);
+            if (bitmap != null)
             {
-                var bitmap = IconManager.GetLargeIcon(ItemPath);
-                if (bitmap != null)
-                {
-                    return Imaging.CreateBitmapSourceFromHBitmap(
-                        bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-                }
+                return Imaging.CreateBitmapSourceFromHBitmap(
+                    bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             }
+
             return null;
         }
     }
@@ -47,5 +47,5 @@ public class TabItemData
 
     public string? ItemRunCommand { get; set; }
 
-    public bool RunWithAdmin { get; set; }
+    public bool RunWithAdmin { get; set; } = false;
 }

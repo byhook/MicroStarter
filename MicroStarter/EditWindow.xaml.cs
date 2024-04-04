@@ -18,7 +18,7 @@ public partial class EditWindow : Window
         TextBoxItemName.Text = _tabItemData.ItemName ?? string.Empty;
         TextBoxItemPath.Text = _tabItemData.ItemPath ?? string.Empty;
         TextBoxIconPath.Text = _tabItemData.ItemIconPath ?? string.Empty;
-        TextBoxRunCommand.Text = _tabItemData.ItemRunCommand;
+        TextBoxRunCommand.Text = _tabItemData.ItemRunCommand ?? string.Empty;
         CheckBoxRunWithAdmin.IsChecked = _tabItemData.RunWithAdmin;
     }
 
