@@ -98,15 +98,12 @@ public sealed class ConfigManager
 
     public void SaveConfig()
     {
-        if (MainConfigItem != null)
+        var options = new JsonSerializerOptions
         {
-            var options = new JsonSerializerOptions
-            {
-                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                WriteIndented = true,
-            };
-            string content = JsonSerializer.Serialize(MainConfigItem, options);
-            File.WriteAllText(ConfigDataName, content);
-        }
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
+            WriteIndented = true
+        };
+        var content = JsonSerializer.Serialize(MainConfigItem, options);
+        File.WriteAllText(ConfigDataName, content);
     }
 }

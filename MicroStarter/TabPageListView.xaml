@@ -68,7 +68,7 @@
         </ListView.ItemsPanel>
         <ListView.ItemTemplate>
             <DataTemplate>
-                <Grid Width="76" Height="96">
+                <Grid Width="66" Height="96">
                     <Image Source="{Binding ItemIconSource}"
                            Height="48" Width="48"
                            Margin="0,6,0,0"
