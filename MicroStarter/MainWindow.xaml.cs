@@ -1,7 +1,11 @@
-﻿using System.IO;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -35,19 +39,53 @@ public partial class MainWindow : Window
             {
                 foreach (var tabItemData in tabPageData.TabItemDataList)
                 {
-                    if (File.Exists(tabItemData.ItemPath))
+                    if (!File.Exists(tabItemData.ItemPath)) continue;
+                    if (!string.IsNullOrEmpty(tabItemData.ItemIconPath) &&
+                        File.Exists(tabItemData.ItemIconPath))
                     {
-                        //比较耗时
-                        var bitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
-                        if (bitmap != null)
-                        {
-                            tabItemData.ItemBitmap = bitmap;
-                        }
+                        continue;
                     }
+
+                    //比较耗时
+                    var iconBitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
+                    string currentDirectory = Directory.GetCurrentDirectory();
+                    string imagesDir = Path.Combine(currentDirectory, "icons");
+                    // 如果目录不存在，则创建
+                    if (!Directory.Exists(imagesDir))
+                    {
+                        Directory.CreateDirectory(imagesDir);
+                    }
+
+                    tabItemData.ItemIconPath = Path.Combine(imagesDir, tabItemData.ItemName + ".ico");
+                    iconBitmap?.Save(tabItemData.ItemIconPath, ImageFormat.Icon);
+                    iconBitmap?.Dispose();
                 }
             }
         }
+
         return mainConfigData;
+    }
+
+    // 假设这是一个WPF应用程序，使用BitmapImage作为ImageSource
+    public async Task<List<BitmapImage>> LoadLocalImageSourcesAsync(List<string> filePaths)
+    {
+        var tasks = filePaths.Select(filePath => LoadImageAsync(filePath)).ToList();
+        var images = await Task.WhenAll(tasks);
+        return images.ToList();
+    }
+
+    private async Task<BitmapImage> LoadImageAsync(string filePath)
+    {
+        using (var stream = await Task.Run(() => System.IO.File.OpenRead(filePath)))
+        {
+            BitmapImage bitmapImage = null;
+            this.Dispatcher.Invoke(() => { bitmapImage = new BitmapImage(); });
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = stream;
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
+            return bitmapImage;
+        }
     }
 
     private async Task LoadListConfigAsync()
@@ -56,7 +94,7 @@ public partial class MainWindow : Window
         var localConfigData = await LoadDataAsync();
 
         // 在 UI 线程上更新 ListView 的数据源
-        this.Dispatcher.Invoke(() =>
+        Application.Current.Dispatcher.InvokeAsync(() =>
         {
             //SetupTabPages();
             // 清空现有数据
@@ -87,12 +125,26 @@ public partial class MainWindow : Window
                 {
                     foreach (var tabItemData in tabPageData.TabItemDataList)
                     {
-                        if (tabItemData.ItemBitmap != null)
-                        {
-                            tabItemData.ItemIconSource = Imaging.CreateBitmapSourceFromHBitmap(
-                                tabItemData.ItemBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
-                                BitmapSizeOptions.FromEmptyOptions());
-                        }
+                        //if (tabItemData.ItemBitmap != null)
+                        //{
+                        // 创建BitmapImage对象
+
+                        BitmapImage bitmapImage = new BitmapImage();
+
+                        // 创建Uri对象指向图片路径
+                        bitmapImage.BeginInit();
+                        bitmapImage.UriSource = new Uri(tabItemData.ItemIconPath);
+                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                        bitmapImage.EndInit();
+
+                        tabItemData.ItemIconSource = bitmapImage;
+
+                        /*
+                        tabItemData.ItemIconSource = Imaging.CreateBitmapSourceFromHBitmap(
+                            tabItemData.ItemBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+                            BitmapSizeOptions.FromEmptyOptions());
+                            */
+                        //}
 
                         _listViewConfigItemModel.ListViewItems.Add(tabItemData);
                     }
@@ -103,63 +155,11 @@ public partial class MainWindow : Window
                 //添加到TabControl里去
                 MainTabControl.Items.Add(newTabItem);
             }
-            //设置默认的下标
-            //MainTabControl.SelectedIndex = 0;
         });
     }
 
-    private void SetupTabPages()
+    private void MainWindow_OnClosed(object? sender, EventArgs e)
     {
-        var mainConfigData = ConfigManager.GetInstance().LoadConfig();
-
-        foreach (var tabPageData in mainConfigData.TabRootData)
-        {
-            var newTabItem = new TabItem
-            {
-                Header = tabPageData.TabName
-            };
-            var tabItemView = new TabPageListView();
-            var tabListView = tabItemView.TabListView;
-            newTabItem.Content = tabListView;
-            tabListView.AllowDrop = true;
-
-            _listViewConfigItemModel = new ListViewConfigItemModel();
-            tabListView.DataContext = _listViewConfigItemModel;
-
-            /*
-            tabListView.DragEnter += new DragEventHandler(listView1_DragEnter);
-            tabListView.DragOver += new DragEventHandler(listView1_DragOver);
-            tabListView.DragLeave += new DragEventHandler(listView1_DragDrop);
-            */
-
-            //tabListView.ItemDrag += ListView1_ItemDrag;
-
-            if (tabPageData.TabItemDataList != null)
-            {
-                foreach (var tabItemData in tabPageData.TabItemDataList)
-                {
-                    if (File.Exists(tabItemData.ItemPath))
-                    {
-                        var bitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
-                        if (bitmap != null)
-                        {
-                            //更新本地的图片资源
-                            tabItemData.ItemIconSource = Imaging.CreateBitmapSourceFromHBitmap(
-                                bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
-                                BitmapSizeOptions.FromEmptyOptions());
-                        }
-                    }
-
-                    _listViewConfigItemModel.ListViewItems.Add(tabItemData);
-                }
-
-                tabListView.ItemsSource = _listViewConfigItemModel.ListViewItems;
-            }
-
-            //添加到TabControl里去
-            MainTabControl.Items.Add(newTabItem);
-        }
-
-        MainTabControl.SelectedIndex = 0;
+        ConfigManager.GetInstance().SaveConfig();
     }
 }

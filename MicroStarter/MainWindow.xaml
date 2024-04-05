@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:MicroStarter"
         mc:Ignorable="d"
         Title="微启动器 1.0" Height="720" Width="360" 
-        Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize">
+        Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize"
+        Closed="MainWindow_OnClosed">
     <Grid>
         <TabControl Name="MainTabControl"
                     SelectedIndex="0"
