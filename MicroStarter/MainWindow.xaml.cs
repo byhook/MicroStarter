@@ -1,7 +1,9 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using GongSolutions.Wpf.DragDrop;
 
@@ -22,6 +24,19 @@ public partial class MainWindow : Window
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         Task.Run(() => { LoadListConfigAsync(); });
+        //底部状态栏
+        SetupImageStart();
+    }
+
+    private void SetupImageStart()
+    {
+        var targetIcon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ResourceAssembly.Location);
+        if (targetIcon != null)
+        {
+            StatusStartImage.Source = Imaging.CreateBitmapSourceFromHBitmap(
+                targetIcon.ToBitmap().GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
+                BitmapSizeOptions.FromEmptyOptions());
+        }
     }
 
     private async Task<ConfigItem> LoadDataAsync()

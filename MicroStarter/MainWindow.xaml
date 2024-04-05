@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MicroStarter"
         mc:Ignorable="d"
-        Title="微启动器 1.0" Height="720" Width="320" 
+        Title="微启动器 1.0" Height="720" Width="320"
         Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize"
         Closed="MainWindow_OnClosed">
     <Grid>
@@ -16,11 +16,14 @@
                     BorderThickness="0">
 
         </TabControl>
-        
+
         <ProgressBar Visibility="Hidden"></ProgressBar>
 
-        <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-            <Image Height="30" Source="MicroStarter.ico" />
+        <StatusBar DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Height="36" Padding="0">
+            <Image Name="StatusStartImage" Width="30"
+                   Source="MicroStarter.ico"
+                   Margin="0,3,3,3"
+                   Visibility="Visible" />
         </StatusBar>
     </Grid>
 
