@@ -1,13 +1,9 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
+﻿using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Threading;
+using GongSolutions.Wpf.DragDrop;
 
 namespace MicroStarter;
 
@@ -66,28 +62,6 @@ public partial class MainWindow : Window
         return mainConfigData;
     }
 
-    // 假设这是一个WPF应用程序，使用BitmapImage作为ImageSource
-    public async Task<List<BitmapImage>> LoadLocalImageSourcesAsync(List<string> filePaths)
-    {
-        var tasks = filePaths.Select(filePath => LoadImageAsync(filePath)).ToList();
-        var images = await Task.WhenAll(tasks);
-        return images.ToList();
-    }
-
-    private async Task<BitmapImage> LoadImageAsync(string filePath)
-    {
-        using (var stream = await Task.Run(() => System.IO.File.OpenRead(filePath)))
-        {
-            BitmapImage bitmapImage = null;
-            this.Dispatcher.Invoke(() => { bitmapImage = new BitmapImage(); });
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = stream;
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.EndInit();
-            return bitmapImage;
-        }
-    }
-
     private async Task LoadListConfigAsync()
     {
         // 执行异步操作，例如从网络或数据库加载数据
@@ -109,15 +83,27 @@ public partial class MainWindow : Window
                 var tabItemView = new TabPageListView();
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
-                tabListView.AllowDrop = true;
+                
+
+                // 设置拖放逻辑
+                GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(tabListView, new FileDropHandler(tabListView));
+                
+                /*
+                tabItemView.DragEnter += MyListView_DragEnter;
+                tabItemView.DragOver += MyListView_DragOver;
+                tabItemView.Drop += listView1_DragDrop;
+                */
 
                 _listViewConfigItemModel = new ListViewConfigItemModel();
                 tabListView.DataContext = _listViewConfigItemModel;
 
+                
+                // 设置拖拽事件
+                //DragDrop.AddDropHandler(tabListView, listView1_DragDrop);
                 /*
-                tabListView.DragEnter += new DragEventHandler(listView1_DragEnter);
-                tabListView.DragOver += new DragEventHandler(listView1_DragOver);
-                tabListView.DragLeave += new DragEventHandler(listView1_DragDrop);
+                tabListView.DragEnter += ListView_DragEnter;
+                tabListView.DragOver += ListView_DragOver;
+                tabListView.Drop += ListView_Drop;
                 */
 
                 //tabListView.ItemDrag += ListView1_ItemDrag;
@@ -157,7 +143,105 @@ public partial class MainWindow : Window
             }
         });
     }
+    
+    private void MyListView_DragEnter(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            e.Effects = DragDropEffects.Move;
+        }
+    }
 
+    public class FileDropHandler : IDropTarget
+    {
+        private readonly ListView _listBox;
+
+        private DefaultDropHandler defaultDropHandler;
+        
+        public FileDropHandler(ListView listBox)
+        {
+            defaultDropHandler = new DefaultDropHandler();
+            _listBox = listBox;
+        }
+
+        public void DragEnter(IDropInfo dropInfo)
+        {
+            dropInfo.Effects = DragDropEffects.Move;
+        }
+
+        public void DragOver(IDropInfo dropInfo)
+        {
+            dropInfo.Effects = DragDropEffects.Move;
+        }
+ 
+        public void Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.StringFormat))
+            {
+                // 从拖拽的数据对象中获取数据
+                string draggedItem = (string)dataObject.GetData(DataFormats.StringFormat);
+
+                // 将拖拽的项添加到 ListView 的数据源中
+                //ItemsSource.Add(draggedItem);
+
+                // 通知库已处理拖拽
+                dropInfo.Effects = DragDropEffects.Move;
+                dropInfo.NotHandled = false;
+            }
+            else
+            {
+                defaultDropHandler.Drop(dropInfo);
+            }
+        }
+    }
+    
+    private void MyListView_DragOver(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            e.Effects = DragDropEffects.Move;
+        }
+    }
+    
+    private void listView1_DragDrop(object sender, DragEventArgs e)
+    {
+        var tabListView = sender as ListView;
+
+        string[] dropFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+        if (dropFiles != null && dropFiles.Length > 0)
+        {
+            // 对拖放的文件进行处理
+            foreach (string filePath in dropFiles)
+            {
+                /*
+                var tabItemData = new TabItemData();
+                if (Path.GetExtension(filePath) == ".lnk")
+                {
+                    dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_WSH_SHELL));
+                    var objShortcut = objWshShell.CreateShortcut(filePath);
+                    tabItemData.ItemPath = objShortcut.TargetPath;
+                    string fileName = Path.GetFileName(objShortcut.TargetPath);
+                    tabItemData.ItemName = fileName;
+                }
+                else
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    tabItemData.ItemName = fileName;
+                    tabItemData.ItemPath = filePath;
+                }
+
+                if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
+                {
+                    //添加到列表里
+                    addTabListItem(tabItemData);
+                }*/
+
+            }
+            ConfigManager.GetInstance().SaveConfig();
+
+        }
+    }
+    
     private void MainWindow_OnClosed(object? sender, EventArgs e)
     {
         ConfigManager.GetInstance().SaveConfig();

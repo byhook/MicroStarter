@@ -3,12 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dd="urn:gong-wpf-dragdrop"
              xmlns:local="clr-namespace:MicroStarter"
              mc:Ignorable="d">
     <ListView Name="TabListView"
               Background="Transparent"
               MouseDoubleClick="TabListView_OnMouseDoubleClick"
-              ScrollViewer.VerticalScrollBarVisibility="Hidden">
+              ScrollViewer.VerticalScrollBarVisibility="Hidden"
+              dd:DragDrop.IsDragSource="True"
+              dd:DragDrop.IsDropTarget="True"
+              AllowDrop="True">
         <!-- 定义上下文菜单 -->
         <ListView.ContextMenu>
             <ContextMenu Name="ListItemContextMenu"
@@ -29,6 +33,7 @@
                             <Border x:Name="Border"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
+                                    CornerRadius="2"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     Margin="{TemplateBinding Margin}"
                                     Padding="{TemplateBinding Padding}"
