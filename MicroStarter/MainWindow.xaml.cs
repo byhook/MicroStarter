@@ -113,11 +113,13 @@ public partial class MainWindow : Window
                 {
                     Header = tabPageData.TabName
                 };
-                var tabItemView = new TabPageListView();
+                
+                _configItemModel = new ConfigItemModel();
+                
+                var tabItemView = new TabPageListView(_configItemModel);
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
 
-                _configItemModel = new ConfigItemModel();
                 tabListView.DataContext = _configItemModel;
 
                 // 设置拖放逻辑

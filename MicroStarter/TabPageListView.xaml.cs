@@ -9,8 +9,12 @@ namespace MicroStarter;
 
 public partial class TabPageListView : UserControl
 {
-    public TabPageListView()
+
+    private ConfigItemModel _configItemModel;
+    
+    public TabPageListView(ConfigItemModel configItemModel)
     {
+        _configItemModel = configItemModel;
         InitializeComponent();
     }
 
@@ -79,15 +83,11 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabItemData = tabPageListView?.SelectedValue as TabListItemData;
-
-        var tabIndex = GetTabControlIndex(tabPageListView);
-        //if (ConfigManager.GetInstance().RemoveTabItemData(tabPageListView.TabIndex, tabItemData))
-        //{
-        tabPageListView?.Items.Remove(tabPageListView?.SelectedItem);
-
-        tabPageListView.Items.Refresh();
-
+        if (tabPageListView != null)
+        {
+            var selectedIndex = tabPageListView.SelectedIndex;
+            _configItemModel.ListViewItems.RemoveAt(selectedIndex);
+        }
         //保存配置到本地`
         //ConfigManager.GetInstance().SaveConfig();
         //}
