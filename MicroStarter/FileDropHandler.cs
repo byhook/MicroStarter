@@ -7,7 +7,7 @@ namespace MicroStarter;
 
 public class FileDropHandler(
         TabControl mainTabControl,
-        ListViewConfigItemModel listViewConfigItemModel)
+        ConfigItemModel configItemModel)
         : IDropTarget
     {
         private readonly DefaultDropHandler _defaultDropHandler = new();
@@ -50,7 +50,7 @@ public class FileDropHandler(
                             //添加到列表里
                             MainWindow.SetupTargetIconWithData(tabItemData);
                             MainWindow.SetupTargetIconSource(tabItemData);
-                            listViewConfigItemModel.ListViewItems.Add(tabItemData);
+                            configItemModel.ListViewItems.Add(tabItemData);
                         }
                     }
 

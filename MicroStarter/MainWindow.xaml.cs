@@ -13,7 +13,7 @@ namespace MicroStarter;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private ListViewConfigItemModel _listViewConfigItemModel;
+    private ConfigItemModel _configItemModel;
 
     public MainWindow()
     {
@@ -117,12 +117,12 @@ public partial class MainWindow : Window
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
 
-                _listViewConfigItemModel = new ListViewConfigItemModel();
-                tabListView.DataContext = _listViewConfigItemModel;
+                _configItemModel = new ConfigItemModel();
+                tabListView.DataContext = _configItemModel;
 
                 // 设置拖放逻辑
                 GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(tabListView,
-                    new FileDropHandler(MainTabControl, _listViewConfigItemModel)
+                    new FileDropHandler(MainTabControl, _configItemModel)
                 );
 
 
@@ -141,10 +141,10 @@ public partial class MainWindow : Window
 
                         tabItemData.ItemIconSource = bitmapImage;
 
-                        _listViewConfigItemModel.ListViewItems.Add(tabItemData);
+                        _configItemModel.ListViewItems.Add(tabItemData);
                     }
 
-                    tabListView.ItemsSource = _listViewConfigItemModel.ListViewItems;
+                    tabListView.ItemsSource = _configItemModel.ListViewItems;
                 }
 
                 //添加到TabControl里去

@@ -6,13 +6,13 @@ using System.Windows.Threading;
 
 namespace MicroStarter;
 
-public class ListViewConfigItemModel : INotifyPropertyChanged
+public class ConfigItemModel : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ObservableCollection<TabListItemData> ListViewItems { get; set; }
 
-    public ListViewConfigItemModel()
+    public ConfigItemModel()
     {
         ListViewItems = new ObservableCollection<TabListItemData>();
         ListViewItems.CollectionChanged += (s, e) => OnPropertyChanged(nameof(ListViewItems));
