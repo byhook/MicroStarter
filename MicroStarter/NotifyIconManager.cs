@@ -35,12 +35,20 @@ public class NotifyIconManager
             };
             exitMenuItem.Click += MenuItem_OnExit_Click;
 
+            _taskbarIcon.TrayMouseDoubleClick += MenuItem_OnShowMain_DoubleClick;
+
             _taskbarIcon.ContextMenu.Items.Add(exitMenuItem);
         }
         else
         {
             _taskbarIcon.Visibility = Visibility.Visible;
         }
+    }
+
+
+    private static void MenuItem_OnShowMain_DoubleClick(object sender, RoutedEventArgs e)
+    {
+        MenuItem_OnShowMain_Click(sender, e);
     }
 
     private static void MenuItem_OnShowMain_Click(object sender, RoutedEventArgs e)
