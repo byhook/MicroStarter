@@ -43,23 +43,42 @@ public partial class MainWindow : Window
                     }
 
                     //比较耗时
-                    var iconBitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
-                    string currentDirectory = Directory.GetCurrentDirectory();
-                    string imagesDir = Path.Combine(currentDirectory, "icons");
-                    // 如果目录不存在，则创建
-                    if (!Directory.Exists(imagesDir))
-                    {
-                        Directory.CreateDirectory(imagesDir);
-                    }
-
-                    tabItemData.ItemIconPath = Path.Combine(imagesDir, tabItemData.ItemName + ".ico");
-                    iconBitmap?.Save(tabItemData.ItemIconPath, ImageFormat.Icon);
-                    iconBitmap?.Dispose();
+                    SetupTargetIconWithData(tabItemData);
                 }
             }
         }
 
         return mainConfigData;
+    }
+
+    private static void SetupTargetIconWithData(TabListItemData tabItemData)
+    {
+        //比较耗时
+        var iconBitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
+        string currentDirectory = Directory.GetCurrentDirectory();
+        string imagesDir = Path.Combine(currentDirectory, "icons");
+        // 如果目录不存在，则创建
+        if (!Directory.Exists(imagesDir))
+        {
+            Directory.CreateDirectory(imagesDir);
+        }
+
+        tabItemData.ItemIconPath = Path.Combine(imagesDir, tabItemData.ItemName + ".ico");
+        iconBitmap?.Save(tabItemData.ItemIconPath, ImageFormat.Icon);
+        iconBitmap?.Dispose();
+    }
+
+    private static void SetupTargetIconSource(TabListItemData tabItemData)
+    {
+        BitmapImage bitmapImage = new BitmapImage();
+
+        // 创建Uri对象指向图片路径
+        bitmapImage.BeginInit();
+        bitmapImage.UriSource = new Uri(tabItemData.ItemIconPath);
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+        bitmapImage.EndInit();
+
+        tabItemData.ItemIconSource = bitmapImage;
     }
 
     private async Task LoadListConfigAsync()
@@ -83,11 +102,8 @@ public partial class MainWindow : Window
                 var tabItemView = new TabPageListView();
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
-                
 
-                // 设置拖放逻辑
-                GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(tabListView, new FileDropHandler(tabListView));
-                
+
                 /*
                 tabItemView.DragEnter += MyListView_DragEnter;
                 tabItemView.DragOver += MyListView_DragOver;
@@ -97,24 +113,17 @@ public partial class MainWindow : Window
                 _listViewConfigItemModel = new ListViewConfigItemModel();
                 tabListView.DataContext = _listViewConfigItemModel;
 
-                
-                // 设置拖拽事件
-                //DragDrop.AddDropHandler(tabListView, listView1_DragDrop);
-                /*
-                tabListView.DragEnter += ListView_DragEnter;
-                tabListView.DragOver += ListView_DragOver;
-                tabListView.Drop += ListView_Drop;
-                */
+                // 设置拖放逻辑
+                GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(tabListView,
+                    new FileDropHandler(MainTabControl, _listViewConfigItemModel)
+                );
 
-                //tabListView.ItemDrag += ListView1_ItemDrag;
+
                 if (tabPageData.TabItemDataList != null)
                 {
                     foreach (var tabItemData in tabPageData.TabItemDataList)
                     {
-                        //if (tabItemData.ItemBitmap != null)
-                        //{
-                        // 创建BitmapImage对象
-
+                    
                         BitmapImage bitmapImage = new BitmapImage();
 
                         // 创建Uri对象指向图片路径
@@ -143,105 +152,66 @@ public partial class MainWindow : Window
             }
         });
     }
-    
-    private void MyListView_DragEnter(object sender, DragEventArgs e)
+
+    public class FileDropHandler(
+        TabControl mainTabControl,
+        ListViewConfigItemModel listViewConfigItemModel)
+        : IDropTarget
     {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
-        {
-            e.Effects = DragDropEffects.Move;
-        }
-    }
-
-    public class FileDropHandler : IDropTarget
-    {
-        private readonly ListView _listBox;
-
-        private DefaultDropHandler defaultDropHandler;
-        
-        public FileDropHandler(ListView listBox)
-        {
-            defaultDropHandler = new DefaultDropHandler();
-            _listBox = listBox;
-        }
-
-        public void DragEnter(IDropInfo dropInfo)
-        {
-            dropInfo.Effects = DragDropEffects.Move;
-        }
+        private readonly DefaultDropHandler _defaultDropHandler = new();
 
         public void DragOver(IDropInfo dropInfo)
         {
             dropInfo.Effects = DragDropEffects.Move;
         }
- 
+
+        private static readonly Guid ClsidWshShell = new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8");
+
         public void Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.StringFormat))
+            if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.FileDrop))
             {
-                // 从拖拽的数据对象中获取数据
-                string draggedItem = (string)dataObject.GetData(DataFormats.StringFormat);
+                var dropFiles = dataObject.GetData(DataFormats.FileDrop) as string[];
+                if (dropFiles != null && dropFiles.Length > 0)
+                {
+                    // 对拖放的文件进行处理
+                    foreach (var filePath in dropFiles)
+                    {
+                        var tabItemData = new TabListItemData();
+                        if (Path.GetExtension(filePath) == ".lnk")
+                        {
+                            dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(ClsidWshShell));
+                            var objShortcut = objWshShell?.CreateShortcut(filePath);
+                            tabItemData.ItemPath = objShortcut?.TargetPath;
+                            string fileName = Path.GetFileName(objShortcut?.TargetPath);
+                            tabItemData.ItemName = fileName;
+                        }
+                        else
+                        {
+                            var fileName = Path.GetFileName(filePath);
+                            tabItemData.ItemName = fileName;
+                            tabItemData.ItemPath = filePath;
+                        }
 
-                // 将拖拽的项添加到 ListView 的数据源中
-                //ItemsSource.Add(draggedItem);
+                        if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
+                        {
+                            //添加到列表里
+                            SetupTargetIconWithData(tabItemData);
+                            SetupTargetIconSource(tabItemData);
+                            listViewConfigItemModel.ListViewItems.Add(tabItemData);
+                        }
+                    }
 
-                // 通知库已处理拖拽
-                dropInfo.Effects = DragDropEffects.Move;
-                dropInfo.NotHandled = false;
+                    ConfigManager.GetInstance().SaveConfig();
+                }
             }
             else
             {
-                defaultDropHandler.Drop(dropInfo);
+                _defaultDropHandler.Drop(dropInfo);
             }
         }
     }
-    
-    private void MyListView_DragOver(object sender, DragEventArgs e)
-    {
-        if (e.Data.GetDataPresent(DataFormats.FileDrop))
-        {
-            e.Effects = DragDropEffects.Move;
-        }
-    }
-    
-    private void listView1_DragDrop(object sender, DragEventArgs e)
-    {
-        var tabListView = sender as ListView;
 
-        string[] dropFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
-        if (dropFiles != null && dropFiles.Length > 0)
-        {
-            // 对拖放的文件进行处理
-            foreach (string filePath in dropFiles)
-            {
-                /*
-                var tabItemData = new TabItemData();
-                if (Path.GetExtension(filePath) == ".lnk")
-                {
-                    dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(CLSID_WSH_SHELL));
-                    var objShortcut = objWshShell.CreateShortcut(filePath);
-                    tabItemData.ItemPath = objShortcut.TargetPath;
-                    string fileName = Path.GetFileName(objShortcut.TargetPath);
-                    tabItemData.ItemName = fileName;
-                }
-                else
-                {
-                    string fileName = Path.GetFileName(filePath);
-                    tabItemData.ItemName = fileName;
-                    tabItemData.ItemPath = filePath;
-                }
-
-                if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
-                {
-                    //添加到列表里
-                    addTabListItem(tabItemData);
-                }*/
-
-            }
-            ConfigManager.GetInstance().SaveConfig();
-
-        }
-    }
-    
     private void MainWindow_OnClosed(object? sender, EventArgs e)
     {
         ConfigManager.GetInstance().SaveConfig();
