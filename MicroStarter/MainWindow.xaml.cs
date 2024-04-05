@@ -1,11 +1,10 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using GongSolutions.Wpf.DragDrop;
 
 namespace MicroStarter;
 
@@ -38,7 +37,7 @@ public partial class MainWindow : Window
                 BitmapSizeOptions.FromEmptyOptions());
         }
     }
-
+    
     private async Task<ConfigItem> LoadDataAsync()
     {
         // 异步数据加载
@@ -66,48 +65,48 @@ public partial class MainWindow : Window
         return mainConfigData;
     }
 
-    private static void SetupTargetIconWithData(TabListItemData tabItemData)
+    public static void SetupTargetIconWithData(TabListItemData tabItemData)
     {
-        //比较耗时
-        var iconBitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
-        string currentDirectory = Directory.GetCurrentDirectory();
-        string imagesDir = Path.Combine(currentDirectory, "icons");
-        // 如果目录不存在，则创建
-        if (!Directory.Exists(imagesDir))
+        if (!string.IsNullOrEmpty(tabItemData.ItemPath))
         {
-            Directory.CreateDirectory(imagesDir);
-        }
+            var iconBitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
+            var currentDirectory = Directory.GetCurrentDirectory();
+            var imagesDir = Path.Combine(currentDirectory, "icons");
+            // 如果目录不存在，则创建
+            if (!Directory.Exists(imagesDir))
+            {
+                Directory.CreateDirectory(imagesDir);
+            }
 
-        tabItemData.ItemIconPath = Path.Combine(imagesDir, tabItemData.ItemName + ".ico");
-        iconBitmap?.Save(tabItemData.ItemIconPath, ImageFormat.Icon);
-        iconBitmap?.Dispose();
+            tabItemData.ItemIconPath = Path.Combine(imagesDir, tabItemData.ItemName + ".ico");
+            iconBitmap?.Save(tabItemData.ItemIconPath, ImageFormat.Icon);
+            iconBitmap?.Dispose();
+        }
     }
 
-    private static void SetupTargetIconSource(TabListItemData tabItemData)
+    public static void SetupTargetIconSource(TabListItemData tabItemData)
     {
-        BitmapImage bitmapImage = new BitmapImage();
+        if (!string.IsNullOrEmpty(tabItemData.ItemIconPath))
+        {
+            BitmapImage bitmapImage = new BitmapImage();
 
-        // 创建Uri对象指向图片路径
-        bitmapImage.BeginInit();
-        bitmapImage.UriSource = new Uri(tabItemData.ItemIconPath);
-        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-        bitmapImage.EndInit();
+            // 创建Uri对象指向图片路径
+            bitmapImage.BeginInit();
+            bitmapImage.UriSource = new Uri(tabItemData.ItemIconPath);
+            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+            bitmapImage.EndInit();
 
-        tabItemData.ItemIconSource = bitmapImage;
+            tabItemData.ItemIconSource = bitmapImage;
+        }
     }
 
     private async Task LoadListConfigAsync()
     {
-        // 执行异步操作，例如从网络或数据库加载数据
+        // 异步操作
         var localConfigData = await LoadDataAsync();
-
         // 在 UI 线程上更新 ListView 的数据源
         Application.Current.Dispatcher.InvokeAsync(() =>
         {
-            //SetupTabPages();
-            // 清空现有数据
-            //ListViewItems.Clear();
-
             foreach (var tabPageData in localConfigData.TabRootData!)
             {
                 var newTabItem = new TabItem
@@ -117,13 +116,6 @@ public partial class MainWindow : Window
                 var tabItemView = new TabPageListView();
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
-
-
-                /*
-                tabItemView.DragEnter += MyListView_DragEnter;
-                tabItemView.DragOver += MyListView_DragOver;
-                tabItemView.Drop += listView1_DragDrop;
-                */
 
                 _listViewConfigItemModel = new ListViewConfigItemModel();
                 tabListView.DataContext = _listViewConfigItemModel;
@@ -149,13 +141,6 @@ public partial class MainWindow : Window
 
                         tabItemData.ItemIconSource = bitmapImage;
 
-                        /*
-                        tabItemData.ItemIconSource = Imaging.CreateBitmapSourceFromHBitmap(
-                            tabItemData.ItemBitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty,
-                            BitmapSizeOptions.FromEmptyOptions());
-                            */
-                        //}
-
                         _listViewConfigItemModel.ListViewItems.Add(tabItemData);
                     }
 
@@ -167,68 +152,18 @@ public partial class MainWindow : Window
             }
         });
     }
-
-    public class FileDropHandler(
-        TabControl mainTabControl,
-        ListViewConfigItemModel listViewConfigItemModel)
-        : IDropTarget
-    {
-        private readonly DefaultDropHandler _defaultDropHandler = new();
-
-        public void DragOver(IDropInfo dropInfo)
-        {
-            dropInfo.Effects = DragDropEffects.Move;
-        }
-
-        private static readonly Guid ClsidWshShell = new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8");
-
-        public void Drop(IDropInfo dropInfo)
-        {
-            if (dropInfo.Data is DataObject dataObject && dataObject.GetDataPresent(DataFormats.FileDrop))
-            {
-                var dropFiles = dataObject.GetData(DataFormats.FileDrop) as string[];
-                if (dropFiles != null && dropFiles.Length > 0)
-                {
-                    // 对拖放的文件进行处理
-                    foreach (var filePath in dropFiles)
-                    {
-                        var tabItemData = new TabListItemData();
-                        if (Path.GetExtension(filePath) == ".lnk")
-                        {
-                            dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(ClsidWshShell));
-                            var objShortcut = objWshShell?.CreateShortcut(filePath);
-                            tabItemData.ItemPath = objShortcut?.TargetPath;
-                            string fileName = Path.GetFileName(objShortcut?.TargetPath);
-                            tabItemData.ItemName = fileName;
-                        }
-                        else
-                        {
-                            var fileName = Path.GetFileName(filePath);
-                            tabItemData.ItemName = fileName;
-                            tabItemData.ItemPath = filePath;
-                        }
-
-                        if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
-                        {
-                            //添加到列表里
-                            SetupTargetIconWithData(tabItemData);
-                            SetupTargetIconSource(tabItemData);
-                            listViewConfigItemModel.ListViewItems.Add(tabItemData);
-                        }
-                    }
-
-                    ConfigManager.GetInstance().SaveConfig();
-                }
-            }
-            else
-            {
-                _defaultDropHandler.Drop(dropInfo);
-            }
-        }
-    }
-
+    
     private void MainWindow_OnClosed(object? sender, EventArgs e)
     {
+        
         ConfigManager.GetInstance().SaveConfig();
+    }
+
+    private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
+    {
+        e.Cancel = true;
+        Hide();
+        ShowInTaskbar = false;//取消窗体在任务栏的显示
+        NotifyIconManager.LoadIconToSystemTray();
     }
 }
