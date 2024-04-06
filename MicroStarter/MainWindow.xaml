@@ -10,6 +10,19 @@
         Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize"
         Closing="MainWindow_OnClosing"
         Closed="MainWindow_OnClosed">
+    <Window.Resources>
+        <Style TargetType="{x:Type TabItem}">
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding}" FontWeight="Bold" Foreground="Black" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <TabControl Name="MainTabControl"
                     SelectedIndex="0"
