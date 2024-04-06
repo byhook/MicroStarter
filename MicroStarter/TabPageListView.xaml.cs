@@ -23,7 +23,7 @@ public partial class TabPageListView : UserControl
         var tabPageListView = sender as ListView;
         var tabListItemData = tabPageListView?.SelectedValue as TabItemViewModel;
 
-        if (File.Exists(tabListItemData?.ItemPath))
+        if (File.Exists(tabListItemData?.ItemPath) || Directory.Exists(tabListItemData?.ItemPath))
         {
             var process = new Process();
             var startInfo = new ProcessStartInfo(tabListItemData.ItemPath,
@@ -45,7 +45,17 @@ public partial class TabPageListView : UserControl
         var tabPageListView = contextMenuItem?.DataContext as ListView;
         var tabListItemData = tabPageListView?.SelectedValue as TabItemViewModel;
 
-        if (File.Exists(tabListItemData?.ItemPath))
+        if (Directory.Exists(tabListItemData?.ItemPath))
+        {
+            // 使用DirectoryInfo获取文件的父目录
+            var startInfo = new ProcessStartInfo
+            {
+                Arguments = tabListItemData.ItemPath,
+                FileName = "explorer.exe"
+            };
+            Process.Start(startInfo);
+        }
+        else if (File.Exists(tabListItemData?.ItemPath))
         {
             // 使用DirectoryInfo获取文件的父目录
             var directoryInfo = Directory.GetParent(tabListItemData.ItemPath);
