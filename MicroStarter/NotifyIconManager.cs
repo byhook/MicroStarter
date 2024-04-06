@@ -59,6 +59,7 @@ public class NotifyIconManager
         }
         if (Application.Current.MainWindow != null)
         {
+            Application.Current.MainWindow.ShowInTaskbar = true;
             Application.Current.MainWindow.Visibility = Visibility.Visible;
         }
     }
