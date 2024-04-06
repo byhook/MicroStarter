@@ -10,9 +10,8 @@ namespace MicroStarter;
 
 public partial class TabPageListView : UserControl
 {
-
     private readonly TabPageViewModel _tabPageViewModel;
-    
+
     public TabPageListView(TabPageViewModel tabPageViewModel)
     {
         _tabPageViewModel = tabPageViewModel;
@@ -26,12 +25,15 @@ public partial class TabPageListView : UserControl
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
-            Process process = new Process();
-            ProcessStartInfo startInfo = new ProcessStartInfo(tabListItemData.ItemPath, tabListItemData.ItemRunCommand);
-            startInfo.UseShellExecute = true;
-            startInfo.CreateNoWindow = true;
-            startInfo.WorkingDirectory = Path.GetDirectoryName(tabListItemData.ItemPath);
-
+            var process = new Process();
+            var startInfo = new ProcessStartInfo(tabListItemData.ItemPath,
+                tabListItemData.ItemRunCommand ?? string.Empty
+            )
+            {
+                UseShellExecute = true,
+                CreateNoWindow = true,
+                WorkingDirectory = Path.GetDirectoryName(tabListItemData.ItemPath)
+            };
             process.StartInfo = startInfo;
             process.Start();
         }
@@ -92,5 +94,4 @@ public partial class TabPageListView : UserControl
             ConfigManager.GetInstance().SaveConfig();
         }
     }
-
 }

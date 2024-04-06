@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Windows.Media;
 
 namespace MicroStarter;
 
@@ -30,8 +31,12 @@ public sealed class IconManager
     public static Bitmap? GetLargeIcon(String targetFile, int targetSize = 128)
     {
         //选中文件中的图标总数
-        var iconTotalCount = PrivateExtractIcons(targetFile, 0, 0, 0, null, null, 0, 0);
-
+        var iconTotalCount = PrivateExtractIcons(targetFile, 0, 0, 0,
+            Array.Empty<IntPtr>(),
+            Array.Empty<int>(),
+            0,
+            0
+        );
         //用于接收获取到的图标指针
         IntPtr[] hIcons = new IntPtr[iconTotalCount];
         //对应的图标id

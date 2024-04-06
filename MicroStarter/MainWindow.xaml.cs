@@ -121,7 +121,7 @@ public partial class MainWindow : Window
 
                 // 设置拖放逻辑
                 GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(tabListView,
-                    new FileDropHandler(MainTabControl, tabPageData)
+                    new FileDropHandler(MainTabControl)
                 );
 
                 if (tabPageData.TabItemDataList != null)

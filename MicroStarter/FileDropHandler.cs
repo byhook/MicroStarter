@@ -7,8 +7,7 @@ using MicroStarter.Config;
 namespace MicroStarter;
 
 public class FileDropHandler(
-        TabControl mainTabControl,
-        TabPageViewModel tabPageViewModel)
+        TabControl mainTabControl)
         : IDropTarget
     {
         private readonly DefaultDropHandler _defaultDropHandler = new();
