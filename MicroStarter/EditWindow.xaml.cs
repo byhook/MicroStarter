@@ -1,34 +1,35 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using MicroStarter.Config;
 
 namespace MicroStarter;
 
 public partial class EditWindow : Window
 {
-    private TabListItemData _tabListItemData;
+    private TabItemViewModel _tabItemViewModel;
 
-    public EditWindow(TabListItemData tabListItemData)
+    public EditWindow(TabItemViewModel tabItemViewModel)
     {
-        _tabListItemData = tabListItemData;
+        _tabItemViewModel = tabItemViewModel;
         InitializeComponent();
     }
 
     private void EditWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
-        TextBoxItemName.Text = _tabListItemData.ItemName ?? string.Empty;
-        TextBoxItemPath.Text = _tabListItemData.ItemPath ?? string.Empty;
-        TextBoxIconPath.Text = _tabListItemData.ItemIconPath ?? string.Empty;
-        TextBoxRunCommand.Text = _tabListItemData.ItemRunCommand ?? string.Empty;
-        CheckBoxRunWithAdmin.IsChecked = _tabListItemData.RunWithAdmin;
+        TextBoxItemName.Text = _tabItemViewModel.ItemName ?? string.Empty;
+        TextBoxItemPath.Text = _tabItemViewModel.ItemPath ?? string.Empty;
+        TextBoxIconPath.Text = _tabItemViewModel.ItemIconPath ?? string.Empty;
+        TextBoxRunCommand.Text = _tabItemViewModel.ItemRunCommand ?? string.Empty;
+        CheckBoxRunWithAdmin.IsChecked = _tabItemViewModel.RunWithAdmin;
     }
 
     private void EditWindow_OnSaveClick(object sender, RoutedEventArgs e)
     {
-        _tabListItemData.ItemName = TextBoxItemName.Text;
-        _tabListItemData.ItemPath = TextBoxItemPath.Text;
-        _tabListItemData.ItemIconPath = TextBoxIconPath.Text;
-        _tabListItemData.ItemRunCommand = TextBoxRunCommand.Text;
-        _tabListItemData.RunWithAdmin = CheckBoxRunWithAdmin.IsChecked.GetValueOrDefault(false);
+        _tabItemViewModel.ItemName = TextBoxItemName.Text;
+        _tabItemViewModel.ItemPath = TextBoxItemPath.Text;
+        _tabItemViewModel.ItemIconPath = TextBoxIconPath.Text;
+        _tabItemViewModel.ItemRunCommand = TextBoxRunCommand.Text;
+        _tabItemViewModel.RunWithAdmin = CheckBoxRunWithAdmin.IsChecked.GetValueOrDefault(false);
         
         ConfigManager.GetInstance().SaveConfig();
         //关闭当前对话框

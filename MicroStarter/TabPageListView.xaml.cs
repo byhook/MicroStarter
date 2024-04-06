@@ -4,24 +4,25 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using MicroStarter.Config;
 
 namespace MicroStarter;
 
 public partial class TabPageListView : UserControl
 {
 
-    private ConfigItemModel _configItemModel;
+    private TabPageViewModel _tabPageViewModel;
     
-    public TabPageListView(ConfigItemModel configItemModel)
+    public TabPageListView(TabPageViewModel tabPageViewModel)
     {
-        _configItemModel = configItemModel;
+        _tabPageViewModel = tabPageViewModel;
         InitializeComponent();
     }
 
     private void TabListView_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         var tabPageListView = sender as ListView;
-        var tabListItemData = tabPageListView?.SelectedValue as TabListItemData;
+        var tabListItemData = tabPageListView?.SelectedValue as TabItemViewModel;
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
@@ -40,7 +41,7 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabListItemData = tabPageListView?.SelectedValue as TabListItemData;
+        var tabListItemData = tabPageListView?.SelectedValue as TabItemViewModel;
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
@@ -59,7 +60,7 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabListItemData = tabPageListView?.SelectedValue as TabListItemData;
+        var tabListItemData = tabPageListView?.SelectedValue as TabItemViewModel;
 
         if (File.Exists(tabListItemData?.ItemPath))
         {
@@ -72,7 +73,7 @@ public partial class TabPageListView : UserControl
     {
         var contextMenuItem = sender as MenuItem;
         var tabPageListView = contextMenuItem?.DataContext as ListView;
-        var tabItemData = tabPageListView?.SelectedValue as TabListItemData;
+        var tabItemData = tabPageListView?.SelectedValue as TabItemViewModel;
         if (tabItemData == null) return;
 
         var editWindow = new EditWindow(tabItemData);
@@ -86,7 +87,7 @@ public partial class TabPageListView : UserControl
         if (tabPageListView != null)
         {
             var selectedIndex = tabPageListView.SelectedIndex;
-            _configItemModel.ListViewItems.RemoveAt(selectedIndex);
+            _tabPageViewModel.RemoveItem(tabPageListView.SelectedItem as TabItemViewModel);
         }
         //保存配置到本地`
         //ConfigManager.GetInstance().SaveConfig();

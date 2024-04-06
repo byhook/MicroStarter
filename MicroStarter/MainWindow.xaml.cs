@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using MicroStarter.Config;
 
 namespace MicroStarter;
 
@@ -13,8 +14,6 @@ namespace MicroStarter;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private ConfigItemModel _configItemModel;
-
     public MainWindow()
     {
         InitializeComponent();
@@ -38,7 +37,7 @@ public partial class MainWindow : Window
         }
     }
     
-    private async Task<ConfigItem> LoadDataAsync()
+    private async Task<TabRootViewModel> LoadDataAsync()
     {
         // 异步数据加载
         var mainConfigData = ConfigManager.GetInstance().LoadConfig();
@@ -65,11 +64,11 @@ public partial class MainWindow : Window
         return mainConfigData;
     }
 
-    public static void SetupTargetIconWithData(TabListItemData tabItemData)
+    public static void SetupTargetIconWithData(TabItemViewModel tabItemViewModel)
     {
-        if (!string.IsNullOrEmpty(tabItemData.ItemPath))
+        if (!string.IsNullOrEmpty(tabItemViewModel.ItemPath))
         {
-            var iconBitmap = IconManager.GetLargeIcon(tabItemData.ItemPath);
+            var iconBitmap = IconManager.GetLargeIcon(tabItemViewModel.ItemPath);
             var currentDirectory = Directory.GetCurrentDirectory();
             var imagesDir = Path.Combine(currentDirectory, "icons");
             // 如果目录不存在，则创建
@@ -78,25 +77,25 @@ public partial class MainWindow : Window
                 Directory.CreateDirectory(imagesDir);
             }
 
-            tabItemData.ItemIconPath = Path.Combine(imagesDir, tabItemData.ItemName + ".ico");
-            iconBitmap?.Save(tabItemData.ItemIconPath, ImageFormat.Icon);
+            tabItemViewModel.ItemIconPath = Path.Combine(imagesDir, tabItemViewModel.ItemName + ".ico");
+            iconBitmap?.Save(tabItemViewModel.ItemIconPath, ImageFormat.Icon);
             iconBitmap?.Dispose();
         }
     }
 
-    public static void SetupTargetIconSource(TabListItemData tabItemData)
+    public static void SetupTargetIconSource(TabItemViewModel tabItemViewModel)
     {
-        if (!string.IsNullOrEmpty(tabItemData.ItemIconPath))
+        if (!string.IsNullOrEmpty(tabItemViewModel.ItemIconPath))
         {
             BitmapImage bitmapImage = new BitmapImage();
 
             // 创建Uri对象指向图片路径
             bitmapImage.BeginInit();
-            bitmapImage.UriSource = new Uri(tabItemData.ItemIconPath);
+            bitmapImage.UriSource = new Uri(tabItemViewModel.ItemIconPath);
             bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
             bitmapImage.EndInit();
 
-            tabItemData.ItemIconSource = bitmapImage;
+            tabItemViewModel.ItemIconSource = bitmapImage;
         }
     }
 
@@ -114,19 +113,16 @@ public partial class MainWindow : Window
                     Header = tabPageData.TabName
                 };
                 
-                _configItemModel = new ConfigItemModel();
-                
-                var tabItemView = new TabPageListView(_configItemModel);
+                var tabItemView = new TabPageListView(tabPageData);
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
 
-                tabListView.DataContext = _configItemModel;
+                tabListView.DataContext = tabPageData.TabItemDataList;
 
                 // 设置拖放逻辑
                 GongSolutions.Wpf.DragDrop.DragDrop.SetDropHandler(tabListView,
-                    new FileDropHandler(MainTabControl, _configItemModel)
+                    new FileDropHandler(MainTabControl, tabPageData)
                 );
-
 
                 if (tabPageData.TabItemDataList != null)
                 {
@@ -142,11 +138,9 @@ public partial class MainWindow : Window
                         bitmapImage.EndInit();
 
                         tabItemData.ItemIconSource = bitmapImage;
-
-                        _configItemModel.ListViewItems.Add(tabItemData);
                     }
 
-                    tabListView.ItemsSource = _configItemModel.ListViewItems;
+                    tabListView.ItemsSource = tabPageData.TabItemDataList;
                 }
 
                 //添加到TabControl里去

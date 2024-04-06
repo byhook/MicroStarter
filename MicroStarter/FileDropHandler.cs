@@ -2,12 +2,13 @@
 using System.Windows;
 using System.Windows.Controls;
 using GongSolutions.Wpf.DragDrop;
+using MicroStarter.Config;
 
 namespace MicroStarter;
 
 public class FileDropHandler(
         TabControl mainTabControl,
-        ConfigItemModel configItemModel)
+        TabPageViewModel tabPageViewModel)
         : IDropTarget
     {
         private readonly DefaultDropHandler _defaultDropHandler = new();
@@ -29,7 +30,7 @@ public class FileDropHandler(
                     // 对拖放的文件进行处理
                     foreach (var filePath in dropFiles)
                     {
-                        var tabItemData = new TabListItemData();
+                        var tabItemData = new TabItemViewModel();
                         if (Path.GetExtension(filePath) == ".lnk")
                         {
                             dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(ClsidWshShell));
@@ -50,7 +51,7 @@ public class FileDropHandler(
                             //添加到列表里
                             MainWindow.SetupTargetIconWithData(tabItemData);
                             MainWindow.SetupTargetIconSource(tabItemData);
-                            configItemModel.ListViewItems.Add(tabItemData);
+                            tabPageViewModel.TabItemDataList.Add(tabItemData);
                         }
                     }
 

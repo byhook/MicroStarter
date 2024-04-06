@@ -1,7 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
+using MicroStarter.Config;
 
 namespace MicroStarter;
 
@@ -13,7 +15,7 @@ public sealed class ConfigManager
         new(() => new ConfigManager());
 
     //配置数据
-    private ConfigItem MainConfigItem { get; set; } = new();
+    private TabRootViewModel MainTabRootViewModel { get; set; } = new();
 
     public static ConfigManager GetInstance()
     {
@@ -24,38 +26,38 @@ public sealed class ConfigManager
     {
     }
 
-    public bool RemoveTabItemData(int tabIndex, TabListItemData tabListItemData)
+    public bool RemoveTabItemData(int tabIndex, TabItemViewModel tabItemViewModel)
     {
-        var tabData = MainConfigItem.TabRootData?[tabIndex];
+        var tabData = MainTabRootViewModel.TabRootData?[tabIndex];
         if (tabData?.TabItemDataList == null) return false;
-        return tabData.TabItemDataList.Remove(tabListItemData);
+        return tabData.TabItemDataList.Remove(tabItemViewModel);
     }
 
-    public bool AddTabItemData(int tabIndex, TabListItemData tabListItemData)
+    public bool AddTabItemData(int tabIndex, TabItemViewModel tabItemViewModel)
     {
-        TabListData? tabData = null;
-        if (MainConfigItem.TabRootData == null)
+        TabPageViewModel? tabData = null;
+        if (MainTabRootViewModel.TabRootData == null)
         {
-            MainConfigItem.TabRootData = new List<TabListData>();
-            tabData = new TabListData();
-            MainConfigItem.TabRootData.Add(tabData);
+            MainTabRootViewModel.TabRootData = new ObservableCollection<TabPageViewModel>();
+            tabData = new TabPageViewModel();
+            MainTabRootViewModel.TabRootData.Add(tabData);
         }
 
-        tabData = MainConfigItem.TabRootData[tabIndex];
-        tabData.TabItemDataList ??= new List<TabListItemData>();
-        if (tabData.TabItemDataList.Any(item => item.ItemPath == tabListItemData.ItemPath))
+        tabData = MainTabRootViewModel.TabRootData[tabIndex];
+        tabData.TabItemDataList ??= new ObservableCollection<TabItemViewModel>();
+        if (tabData.TabItemDataList.Any(item => item.ItemPath == tabItemViewModel.ItemPath))
         {
             return false;
         }
 
-        tabData.TabItemDataList?.Add(tabListItemData);
+        tabData.TabItemDataList?.Add(tabItemViewModel);
         return true;
     }
 
 
     public void SwapTabItemData(int tabIndex, int dragIndex, int dropIndex)
     {
-        var tabData = MainConfigItem.TabRootData?[tabIndex];
+        var tabData = MainTabRootViewModel.TabRootData?[tabIndex];
         if (tabData?.TabItemDataList == null) return;
         var dragItemData = tabData.TabItemDataList[dragIndex];
         tabData.TabItemDataList.Remove(dragItemData);
@@ -64,36 +66,36 @@ public sealed class ConfigManager
         SaveConfig();
     }
 
-    public ConfigItem LoadConfig()
+    public TabRootViewModel LoadConfig()
     {
-        ConfigItem? tempConfigData = null;
+        TabRootViewModel? tempConfigData = null;
         if (File.Exists(ConfigDataName))
         {
             var configContent = File.ReadAllText(ConfigDataName);
             if (!string.IsNullOrEmpty(configContent))
             {
-                tempConfigData = JsonSerializer.Deserialize<ConfigItem>(configContent);
+                tempConfigData = JsonSerializer.Deserialize<TabRootViewModel>(configContent);
             }
         }
 
         if (tempConfigData != null)
         {
-            MainConfigItem = tempConfigData;
+            MainTabRootViewModel = tempConfigData;
         }
         else if (tempConfigData == null)
         {
-            MainConfigItem = new ConfigItem();
+            MainTabRootViewModel = new TabRootViewModel();
         }
 
-        if (MainConfigItem.TabRootData != null) return MainConfigItem;
+        if (MainTabRootViewModel.TabRootData != null) return MainTabRootViewModel;
         //本地没有配置或者解析失败-默认给个常用工具配置
-        var tabDataList = new List<TabListData>();
-        var tabData = new TabListData();
+        var tabDataList = new ObservableCollection<TabPageViewModel>();
+        var tabData = new TabPageViewModel();
         tabData.TabName = "常用工具";
         tabDataList.Add(tabData);
-        MainConfigItem.TabRootData = tabDataList;
+        MainTabRootViewModel.TabRootData = tabDataList;
 
-        return MainConfigItem;
+        return MainTabRootViewModel;
     }
 
     public void SaveConfig()
@@ -103,7 +105,7 @@ public sealed class ConfigManager
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
             WriteIndented = true
         };
-        var content = JsonSerializer.Serialize(MainConfigItem, options);
+        var content = JsonSerializer.Serialize(MainTabRootViewModel, options);
         File.WriteAllText(ConfigDataName, content);
     }
 }
