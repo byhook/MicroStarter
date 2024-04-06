@@ -5,8 +5,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:local="clr-namespace:MicroStarter"
         mc:Ignorable="d"
-        Title="编辑" Height="390" Width="450" 
-        ResizeMode="NoResize" 
+        Title="编辑" Height="390" Width="450"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         Loaded="EditWindow_OnLoaded">
 
@@ -68,11 +68,6 @@
                 Style="{StaticResource InputTextBoxStyle}">
             </TextBox>
 
-            <Button Width="56" Height="24" HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Content="浏览">
-
-            </Button>
         </Grid>
 
         <Grid Margin="0,10,0,0">
@@ -88,8 +83,7 @@
             </TextBox>
             <Button Width="56" Height="24" HorizontalAlignment="Right"
                     VerticalAlignment="Center"
-                    Content="浏览"
-                    Margin="0,0,0,0">
+                    Content="浏览">
 
             </Button>
         </Grid>
@@ -104,6 +98,12 @@
                 VerticalContentAlignment="Top"
                 Height="60">
             </TextBox>
+            <Button Width="56" Height="24" HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Content="浏览"
+                    Margin="0,0,0,0">
+
+            </Button>
         </Grid>
 
         <Grid Margin="0,10,0,0">
@@ -120,7 +120,7 @@
         </Grid>
 
         <CheckBox Name="CheckBoxRunWithAdmin"
-            Width="145" Height="30" HorizontalAlignment="Left"
+                  Width="145" Height="30" HorizontalAlignment="Left"
                   VerticalAlignment="Top"
                   Margin="80,10,0,0"
                   Content="始终以管理员身份运行"

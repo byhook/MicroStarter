@@ -82,6 +82,8 @@ public partial class MainWindow : Window
             var fileInfo = new FileInfo(tabItemViewModel.ItemPath);
             if (fileInfo.Attributes != FileAttributes.Directory)
             {
+                var iconName = FileUtils.GetMd5Hash(tabItemViewModel.ItemPath).Substring(0, 6);
+
                 var iconBitmap = IconManager.GetLargeIcon(tabItemViewModel.ItemPath);
                 var currentDirectory = Directory.GetCurrentDirectory();
                 var imagesDir = Path.Combine(currentDirectory, "icons");
@@ -91,7 +93,9 @@ public partial class MainWindow : Window
                     Directory.CreateDirectory(imagesDir);
                 }
 
-                tabItemViewModel.ItemIconPath = Path.Combine(imagesDir, tabItemViewModel.ItemName + ".ico");
+                tabItemViewModel.ItemIconPath = Path.Combine(imagesDir,
+                    tabItemViewModel.ItemName + "_" + iconName + ".ico"
+                );
                 iconBitmap?.Save(tabItemViewModel.ItemIconPath, ImageFormat.Icon);
                 iconBitmap?.Dispose();
             }
@@ -177,6 +181,6 @@ public partial class MainWindow : Window
         e.Cancel = true;
         Hide();
         //取消窗体在任务栏的显示
-        ShowInTaskbar = false; 
+        ShowInTaskbar = false;
     }
 }
