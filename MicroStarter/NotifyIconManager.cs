@@ -39,10 +39,6 @@ public class NotifyIconManager
 
             _taskbarIcon.ContextMenu.Items.Add(exitMenuItem);
         }
-        else
-        {
-            _taskbarIcon.Visibility = Visibility.Visible;
-        }
     }
 
 
@@ -53,14 +49,18 @@ public class NotifyIconManager
 
     private static void MenuItem_OnShowMain_Click(object sender, RoutedEventArgs e)
     {
-        if (_taskbarIcon != null)
-        {
-            _taskbarIcon.Visibility = Visibility.Hidden;
-        }
         if (Application.Current.MainWindow != null)
         {
-            Application.Current.MainWindow.ShowInTaskbar = true;
-            Application.Current.MainWindow.Visibility = Visibility.Visible;
+            if (Application.Current.MainWindow.ShowInTaskbar)
+            {
+                Application.Current.MainWindow.ShowInTaskbar = false;
+                Application.Current.MainWindow.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Application.Current.MainWindow.ShowInTaskbar = true;
+                Application.Current.MainWindow.Visibility = Visibility.Visible;
+            }
         }
     }
 

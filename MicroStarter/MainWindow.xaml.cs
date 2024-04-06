@@ -25,6 +25,8 @@ public partial class MainWindow : Window
         Task.Run(() => { LoadListConfigAsync(); });
         //底部状态栏
         SetupImageStart();
+        //系统状态栏
+        NotifyIconManager.LoadIconToSystemTray();
     }
 
     private void SetupImageStart()
@@ -174,7 +176,7 @@ public partial class MainWindow : Window
     {
         e.Cancel = true;
         Hide();
-        ShowInTaskbar = false; //取消窗体在任务栏的显示
-        NotifyIconManager.LoadIconToSystemTray();
+        //取消窗体在任务栏的显示
+        ShowInTaskbar = false; 
     }
 }
