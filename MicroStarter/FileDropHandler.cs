@@ -51,7 +51,6 @@ public class FileDropHandler(
                             //添加到列表里
                             MainWindow.SetupTargetIconWithData(tabItemData);
                             MainWindow.SetupTargetIconSource(tabItemData);
-                            tabPageViewModel.TabItemDataList.Add(tabItemData);
                         }
                     }
 

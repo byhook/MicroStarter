@@ -18,6 +18,14 @@ public class TabPageViewModel : INotifyPropertyChanged
         TabItemDataList.CollectionChanged += (s, e) => OnPropertyChanged(nameof(TabItemDataList));
     }
 
+    public void RemoveItem(int index)
+    {
+        if (TabItemDataList != null && index >= 0 && index < TabItemDataList.Count)
+        {
+            TabItemDataList.RemoveAt(index);
+        }
+    }
+    
     public void RemoveItem(TabItemViewModel item)
     {
         if (TabItemDataList != null && TabItemDataList.Contains(item))
