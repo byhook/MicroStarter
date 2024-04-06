@@ -48,7 +48,7 @@ public class FileDropHandler(
                         if (ConfigManager.GetInstance().AddTabItemData(mainTabControl.SelectedIndex, tabItemData))
                         {
                             //添加到列表里
-                            MainWindow.SetupTargetIconWithData(tabItemData);
+                            MainWindow.SetupTargetPathData(tabItemData);
                             MainWindow.SetupTargetIconSource(tabItemData);
                         }
                     }

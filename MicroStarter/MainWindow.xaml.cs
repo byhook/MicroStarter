@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using MicroStarter.Config;
 
@@ -36,7 +37,7 @@ public partial class MainWindow : Window
                 BitmapSizeOptions.FromEmptyOptions());
         }
     }
-    
+
     private async Task<TabRootViewModel> LoadDataAsync()
     {
         // 异步数据加载
@@ -46,17 +47,25 @@ public partial class MainWindow : Window
         {
             if (tabPageData.TabItemDataList != null)
             {
-                foreach (var tabItemData in tabPageData.TabItemDataList)
+                var itemList = tabPageData.TabItemDataList;
+                for (int i = 0; i < itemList.Count; i++)
                 {
-                    if (!File.Exists(tabItemData.ItemPath)) continue;
-                    if (!string.IsNullOrEmpty(tabItemData.ItemIconPath) &&
-                        File.Exists(tabItemData.ItemIconPath))
+                    if (!File.Exists(itemList[i].ItemPath) &&
+                        !Directory.Exists(itemList[i].ItemPath))
+                    {
+                        itemList.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(itemList[i].ItemIconPath) &&
+                        File.Exists(itemList[i].ItemIconPath))
                     {
                         continue;
                     }
 
                     //比较耗时
-                    SetupTargetIconWithData(tabItemData);
+                    SetupTargetPathData(itemList[i]);
                 }
             }
         }
@@ -64,28 +73,33 @@ public partial class MainWindow : Window
         return mainConfigData;
     }
 
-    public static void SetupTargetIconWithData(TabItemViewModel tabItemViewModel)
+    public static void SetupTargetPathData(TabItemViewModel tabItemViewModel)
     {
         if (!string.IsNullOrEmpty(tabItemViewModel.ItemPath))
         {
-            var iconBitmap = IconManager.GetLargeIcon(tabItemViewModel.ItemPath);
-            var currentDirectory = Directory.GetCurrentDirectory();
-            var imagesDir = Path.Combine(currentDirectory, "icons");
-            // 如果目录不存在，则创建
-            if (!Directory.Exists(imagesDir))
+            var fileInfo = new FileInfo(tabItemViewModel.ItemPath);
+            if (fileInfo.Attributes != FileAttributes.Directory)
             {
-                Directory.CreateDirectory(imagesDir);
-            }
+                var iconBitmap = IconManager.GetLargeIcon(tabItemViewModel.ItemPath);
+                var currentDirectory = Directory.GetCurrentDirectory();
+                var imagesDir = Path.Combine(currentDirectory, "icons");
+                // 如果目录不存在，则创建
+                if (!Directory.Exists(imagesDir))
+                {
+                    Directory.CreateDirectory(imagesDir);
+                }
 
-            tabItemViewModel.ItemIconPath = Path.Combine(imagesDir, tabItemViewModel.ItemName + ".ico");
-            iconBitmap?.Save(tabItemViewModel.ItemIconPath, ImageFormat.Icon);
-            iconBitmap?.Dispose();
+                tabItemViewModel.ItemIconPath = Path.Combine(imagesDir, tabItemViewModel.ItemName + ".ico");
+                iconBitmap?.Save(tabItemViewModel.ItemIconPath, ImageFormat.Icon);
+                iconBitmap?.Dispose();
+            }
         }
     }
 
     public static void SetupTargetIconSource(TabItemViewModel tabItemViewModel)
     {
-        if (!string.IsNullOrEmpty(tabItemViewModel.ItemIconPath))
+        if (!string.IsNullOrEmpty(tabItemViewModel.ItemIconPath) &&
+            File.Exists((tabItemViewModel.ItemIconPath)))
         {
             BitmapImage bitmapImage = new BitmapImage();
 
@@ -96,6 +110,17 @@ public partial class MainWindow : Window
             bitmapImage.EndInit();
 
             tabItemViewModel.ItemIconSource = bitmapImage;
+        }
+        else if (!string.IsNullOrEmpty(tabItemViewModel.ItemPath))
+        {
+            var fileInfo = new FileInfo(tabItemViewModel.ItemPath);
+            if (fileInfo.Attributes == FileAttributes.Directory)
+            {
+                var imageSource = new BitmapImage(new Uri(
+                    "/Resources/Directory.ico",
+                    UriKind.Relative));
+                tabItemViewModel.ItemIconSource = imageSource;
+            }
         }
     }
 
@@ -112,7 +137,7 @@ public partial class MainWindow : Window
                 {
                     Header = tabPageData.TabName
                 };
-                
+
                 var tabItemView = new TabPageListView(tabPageData);
                 var tabListView = tabItemView.TabListView;
                 newTabItem.Content = tabListView;
@@ -128,16 +153,7 @@ public partial class MainWindow : Window
                 {
                     foreach (var tabItemData in tabPageData.TabItemDataList)
                     {
-                    
-                        BitmapImage bitmapImage = new BitmapImage();
-
-                        // 创建Uri对象指向图片路径
-                        bitmapImage.BeginInit();
-                        bitmapImage.UriSource = new Uri(tabItemData.ItemIconPath);
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmapImage.EndInit();
-
-                        tabItemData.ItemIconSource = bitmapImage;
+                        SetupTargetIconSource(tabItemData);
                     }
 
                     tabListView.ItemsSource = tabPageData.TabItemDataList;
@@ -148,7 +164,7 @@ public partial class MainWindow : Window
             }
         });
     }
-    
+
     private void MainWindow_OnClosed(object? sender, EventArgs e)
     {
         ConfigManager.GetInstance().SaveConfig();
@@ -158,7 +174,7 @@ public partial class MainWindow : Window
     {
         e.Cancel = true;
         Hide();
-        ShowInTaskbar = false;//取消窗体在任务栏的显示
+        ShowInTaskbar = false; //取消窗体在任务栏的显示
         NotifyIconManager.LoadIconToSystemTray();
     }
 }
