@@ -3,8 +3,11 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using MicroStarter.Config;
+using Clipboard = System.Windows.Clipboard;
+using ListView = System.Windows.Controls.ListView;
+using MessageBox = System.Windows.MessageBox;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace MicroStarter;
 
@@ -36,6 +39,17 @@ public partial class TabPageListView : UserControl
             };
             process.StartInfo = startInfo;
             process.Start();
+        }
+        else
+        {
+            var result = MessageBox.Show(
+                "当前文件不存在，是否需要移除？",
+                "错误",
+                MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.Yes)
+            {
+                _tabPageViewModel.RemoveItem(tabListItemData);
+            }
         }
     }
 

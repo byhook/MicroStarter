@@ -11,7 +11,12 @@ public partial class App : Application
 {
     protected override void OnStartup(StartupEventArgs e)
     {
-        Mutex mutex = new Mutex(true, "MicroStarter");
+#if DEBUG
+        var mutexName = "Debug";
+#else
+        var  mutexName = "Release";
+#endif
+        Mutex mutex = new Mutex(true, "MicroStarter" + mutexName);
         if (mutex.WaitOne(0, false))
         {
             base.OnStartup(e);

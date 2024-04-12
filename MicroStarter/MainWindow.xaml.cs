@@ -22,6 +22,9 @@ public partial class MainWindow : Window
 
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
+        //设置标题
+        Title = "微启动器 1.2";
+        
         Task.Run(() => { LoadListConfigAsync(); });
         //底部状态栏
         SetupImageStart();
