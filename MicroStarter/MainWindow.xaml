@@ -8,8 +8,7 @@
         Title="微启动器 1.0" Height="720" Width="320"
         WindowStartupLocation="CenterScreen"
         Loaded="MainWindow_OnLoaded" ResizeMode="CanMinimize"
-        Closing="MainWindow_OnClosing"
-        Closed="MainWindow_OnClosed">
+        Closing="MainWindow_OnClosing">
     <Window.Resources>
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="HeaderTemplate">

@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using GongSolutions.Wpf.DragDrop;
 using MicroStarter.Config;
 
+using IWshRuntimeLibrary;
 namespace MicroStarter;
 
 public class FileDropHandler(
@@ -33,14 +34,14 @@ public class FileDropHandler(
                         if (Path.GetExtension(filePath) == ".lnk")
                         {
                             dynamic objWshShell = Activator.CreateInstance(Type.GetTypeFromCLSID(ClsidWshShell));
-                            var objShortcut = objWshShell?.CreateShortcut(filePath);
+                            var objShortcut = objWshShell?.CreateShortcut(filePath) as IWshShortcut;
                             tabItemData.ItemPath = objShortcut?.TargetPath;
-                            string fileName = Path.GetFileName(objShortcut?.TargetPath);
+                            string fileName = Path.GetFileNameWithoutExtension(objShortcut?.FullName);
                             tabItemData.ItemName = fileName;
                         }
                         else
                         {
-                            var fileName = Path.GetFileName(filePath);
+                            var fileName = Path.GetFileNameWithoutExtension(filePath);
                             tabItemData.ItemName = fileName;
                             tabItemData.ItemPath = filePath;
                         }

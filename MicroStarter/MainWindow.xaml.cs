@@ -171,11 +171,6 @@ public partial class MainWindow : Window
         });
     }
 
-    private void MainWindow_OnClosed(object? sender, EventArgs e)
-    {
-        ConfigManager.GetInstance().SaveConfig();
-    }
-
     private void MainWindow_OnClosing(object? sender, CancelEventArgs e)
     {
         e.Cancel = true;
