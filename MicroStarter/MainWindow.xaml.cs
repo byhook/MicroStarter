@@ -23,13 +23,24 @@ public partial class MainWindow : Window
     private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
     {
         //设置标题
-        Title = "微启动器 1.2";
-        
-        Task.Run(() => { LoadListConfigAsync(); });
+        Title = "微启动器";
+        Task.Run(() => { _ = LoadListConfigAsync(); });
         //底部状态栏
         SetupImageStart();
         //系统状态栏
         NotifyIconManager.LoadIconToSystemTray();
+    }
+
+    protected override void OnSourceInitialized(EventArgs e)
+    {
+        base.OnSourceInitialized(e);
+        HotKey.RegisterHotKey(this);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        HotKey.UnRegisterHotKey();
+        base.OnClosed(e);
     }
 
     private void SetupImageStart()
