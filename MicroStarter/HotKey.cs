@@ -41,6 +41,7 @@ public static class HotKey
                         {
                             Application.Current.MainWindow.ShowInTaskbar = true;
                             Application.Current.MainWindow.Visibility = Visibility.Visible;
+                            Application.Current.MainWindow.WindowState = WindowState.Normal;
                         }
                         handled = true;
                         break;

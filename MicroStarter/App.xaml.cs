@@ -9,6 +9,8 @@ namespace MicroStarter;
 /// </summary>
 public partial class App : Application
 {
+    
+    private static Mutex mutex;
     protected override void OnStartup(StartupEventArgs e)
     {
 #if DEBUG
@@ -16,8 +18,9 @@ public partial class App : Application
 #else
         var  mutexName = "Release";
 #endif
-        Mutex mutex = new Mutex(true, "MicroStarter" + mutexName);
-        if (mutex.WaitOne(0, false))
+        bool createdNew;
+        mutex = new Mutex(true, "MicroStarter" + mutexName,out createdNew);
+        if (createdNew)
         {
             base.OnStartup(e);
         }
@@ -26,4 +29,11 @@ public partial class App : Application
             this.Shutdown();
         }
     }
+    
+    protected override void OnExit(ExitEventArgs e)
+    {
+        mutex.ReleaseMutex();
+        base.OnExit(e);
+    }
+    
 }
